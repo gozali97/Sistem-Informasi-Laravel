@@ -9,6 +9,7 @@ class LabPeriksa extends Model
 {
     use HasFactory;
     protected $primaryKey = 'lab_kode';
-    public $autoincrement = false;
+
+    public $incrementing = false;
     protected $guarded = [];
 }

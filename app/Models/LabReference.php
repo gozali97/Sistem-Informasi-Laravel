@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class LabReference extends Model
 {
     use HasFactory;
+
+    protected $table = 'lab_references';
+    protected $primaryKey = 'id';
+
+    protected $guarded = [];
 }

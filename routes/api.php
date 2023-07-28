@@ -1,7 +1,31 @@
 <?php
 
+use App\Http\Controllers\Api\AccessTokenController;
+use App\Http\Controllers\Api\GroupPaketController;
+use App\Http\Controllers\Api\LayananController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\PasienController;
+use App\Http\Controllers\Api\RujukanController;
+use App\Http\Controllers\Api\TentangKamiController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserMobileController;
+// use App\Http\Controllers\Api\PengirimController;
+use App\Http\Controllers\Api\PemeriksaanController;
+use App\Http\Controllers\Api\TransaksiController;
+use App\Http\Controllers\Api\RawatJalanCotroller;
+use App\Http\Controllers\Api\PenjaminController;
+use App\Http\Controllers\Api\AlamatController;
+use App\Http\Controllers\Api\BankController;
+use App\Http\Controllers\Api\BcaController;
+use App\Http\Controllers\Api\DokterController;
+use App\Http\Controllers\Api\TampilInformasi;
+use App\Http\Controllers\Api\SyaratKetentuanController;
+use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\EmailVerificationController;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendEmail;
+
 
 /*
 |--------------------------------------------------------------------------

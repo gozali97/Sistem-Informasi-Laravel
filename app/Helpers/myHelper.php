@@ -6,6 +6,6 @@ if (!function_exists('getMenus')) {
 
     function getMenus()
     {
-        return Navigation::with('subMenus')->where('main_menu')->get();
+        return Navigation::with('subMenus')->where('main_menu')->orderBy('id', 'asc')->get();
     }
 }

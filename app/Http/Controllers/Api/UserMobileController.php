@@ -4,14 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Mail\VerificationEmail;
 use App\Models\UserMobile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use App\Models\Pasien;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\DB;
+
 
 class UserMobileController extends Controller
 {

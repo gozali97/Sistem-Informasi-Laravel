@@ -17,32 +17,18 @@
                     <div class="form-group col-6">
                         <label for="frist_name">First Name</label>
                         <input id="frist_name" type="text" value="{{ old('first_name') }}" class="form-control"
-                            name="first_name" autofocus>
+                            name="first_name" autofocus required>
                     </div>
                     <div class="form-group col-6">
                         <label for="last_name">Last Name</label>
                         <input id="last_name" type="text" value="{{ old('last_name') }}" class="form-control"
-                            name="last_name">
+                            name="last_name" required>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="form-group col-6">
-                        <label for="username">Username</label>
-                        <input id="username" type="text" class="form-control" type="text" name="username"
-                            value="{{ old('username') }}" required autofocus>
-                    </div>
-                    <div class="form-group col-6">
-                        <label for="role">Roles</label>
-                        <select name="tacces_code" class="form-control" id="tacces_code">
-                            <option value="">-- pilih --</option>
-                            @php
-                                $roles = \App\Models\role::all();
-                            @endphp
-                            @foreach ($roles as $role)
-                                <option value="{{ $role->id }}">{{ $role->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input id="username" type="text" class="form-control" type="text" name="username"
+                        value="{{ old('username') }}" required autofocus>
                 </div>
 
                 <div class="form-group">
@@ -57,7 +43,7 @@
                     <div class="form-group col-6">
                         <label for="password" class="d-block">Password</label>
                         <input id="password" type="password" class="form-control pwstrength"
-                            data-indicator="pwindicator" name="password">
+                            data-indicator="pwindicator" name="password" required>
                         <div id="pwindicator" class="pwindicator">
                             <div class="bar"></div>
                             <div class="label"></div>
@@ -65,7 +51,8 @@
                     </div>
                     <div class="form-group col-6">
                         <label for="password2" class="d-block">Password Confirmation</label>
-                        <input id="password2" type="password" class="form-control" name="password_confirmation">
+                        <input id="password2" type="password" class="form-control" name="password_confirmation"
+                            required>
                     </div>
                 </div>
 
@@ -73,6 +60,12 @@
                 </div>
                 <button type="submit" class="btn btn-primary d-grid w-100">Sign up</button>
             </form>
+            <p class="text-center">
+                <span>Already have an account?</span>
+                <a href="{{ route('login') }}">
+                    <span>Sign in instead</span>
+                </a>
+            </p>
         </div>
     </div>
 

@@ -10,13 +10,15 @@
                 Tambah
             </button>
         </div>
+        <hr class="m-0">
         <div class="table-responsive text-nowrap">
             <div class="p-4">
                 <table class="table table-striped" id="table1">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Nama Permission</th>
+                            <th>Nama User</th>
+                            <th>Nama ROle</th>
                             <th>Akses</th>
                             <th>Action</th>
                         </tr>
@@ -25,13 +27,14 @@
                         @foreach ($data as $d)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
+                                <td>{{ $d->first_name }}</td>
                                 <td>{{ $d->name }}</td>
                                 <td>{{ $d->guard_name }}</td>
                                 <td>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-icon btn-outline-warning"
                                             data-bs-toggle="modal" data-bs-target="#editModal{{ $d->id }}">
-                                            <span class="tf-icons bx bx-pen"></span>
+                                            <span class="tf-icons bx bx-edit"></span>
                                         </button>
                                         <button type="button" class="btn btn-icon btn-outline-danger"
                                             onclick="event.preventDefault(); confirmDelete('{{ $d->id }}');">
@@ -51,23 +54,31 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                         </div>
-                                        <form action="{{ route('navigasi.update', $d->id) }}">
+                                        <form action="{{ route('permission.update', $d->id) }}">
                                             @csrf
                                             <div class="modal-body">
                                                 <div class="row">
                                                     <div class="col mb-3">
-                                                        <label for="nameWithTitle" class="form-label">Nama Role</label>
-                                                        <input type="text" id="nameWithTitle"
-                                                            value="{{ $d->name }}" name="name"
-                                                            class="form-control" placeholder="Enter Name">
+                                                        <label for="nameWithTitle" class="form-label">Nama User</label>
+                                                        <select name="user_id" class="form-control" id="">
+                                                            <option value="">--Pilih--</option>
+                                                            @foreach ($users as $user)
+                                                                <option value="{{ $user->id }}"
+                                                                    {{ $user->id == $d->model_id ? 'selected' : '' }}>
+                                                                    {{ $user->first_name }}</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col mb-0">
-                                                        <label for="emailWithTitle" class="form-label">Akses</label>
-                                                        <input type="text" id="emailWithTitle"
-                                                            value="{{ $d->guard_name }}" name="guard_name"
-                                                            class="form-control" placeholder="xxxx@xxx.xx">
+                                                    <div class="col mb-3">
+                                                        <label for="nameWithTitle" class="form-label">Nama Role</label>
+                                                        <select name="model_id" class="form-control" id="">
+                                                            <option value="">--Pilih--</option>
+                                                            @foreach ($roles as $role)
+                                                                <option value="{{ $role->id }}"
+                                                                    {{ $role->id == $d->role_id ? 'selected' : '' }}>
+                                                                    {{ $role->name }}</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
                                                 </div>
 
@@ -94,7 +105,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalCenterTitle">Tambah Permission</h5>
+                    <h5 class="modal-title" id="modalCenterTitle">Tambah Role</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ route('permission.store') }}">
@@ -102,15 +113,23 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col mb-3">
-                                <label for="nameWithTitle" class="form-label">Nama Permission</label>
-                                <select name="id" class="form-control" id="">
+                                <label for="nameWithTitle" class="form-label">Nama User</label>
+                                <select name="user_id" class="form-control" id="">
                                     <option value="">--Pilih--</option>
-                                    @foreach ($menu as $m)
-                                        <option value="{{ $m->id }}">{{ $m->name }}</option>
+                                    @foreach ($usersWithoutRole as $user)
+                                        <option value="{{ $user->id }}">{{ $user->first_name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-
+                            <div class="col mb-3">
+                                <label for="nameWithTitle" class="form-label">Nama Role</label>
+                                <select name="role_id" class="form-control" id="">
+                                    <option value="">--Pilih--</option>
+                                    @foreach ($roles as $role)
+                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
                     </div>

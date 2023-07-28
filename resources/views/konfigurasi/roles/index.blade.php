@@ -11,6 +11,7 @@
                 Tambah
             </button>
         </div>
+        <hr class="m-0">
         <div class="table-responsive text-nowrap">
             <div class="p-4">
                 <table class="table table-striped" id="table1">
@@ -32,7 +33,7 @@
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-icon btn-outline-warning"
                                             data-bs-toggle="modal" data-bs-target="#editModal{{ $d->id }}">
-                                            <span class="tf-icons bx bx-pen"></span>
+                                            <span class="tf-icons bx bx-edit"></span>
                                         </button>
                                         <a type="button" class="btn btn-icon btn-outline-info"
                                             href="{{ route('roles.view', $d->id) }}">
@@ -99,7 +100,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalCenterTitle">Update Role</h5>
+                    <h5 class="modal-title" id="modalCenterTitle">Tambah Role</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ route('roles.store') }}">
@@ -164,7 +165,7 @@
                 cancelButtonText: "Batal",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = "/konfigurasi/roles/destroy/" + id;
+                    window.location.href = "/master/paketlab/destroy/" + id;
                 }
             });
         }

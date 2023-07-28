@@ -52,11 +52,30 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.2/dist/sweetalert2.min.css">
+    <link href="{{ url('/assets/modules/select2/css/select2.min.css') }}" rel="stylesheet" />
+
+    <style>
+        #spinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+    </style>
 
 </head>
 
 <body>
-    <div class="layout-wrapper layout-content-navbar">
+    <div id="spinner" class="layout-wrapper d-flex justify-content-center">
+        <div class="d-flex flex-column justify-content-center align-items-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="mt-1">Loading . . .</div>
+        </div>
+    </div>
+    <div id="content" class="layout-wrapper layout-content-navbar hidden d-none">
         <div class="layout-container">
             <!-- Menu -->
 
@@ -106,6 +125,14 @@
         <!-- Overlay -->
         <div class="layout-overlay layout-menu-toggle"></div>
     </div>
+    <script>
+        function showContent() {
+            document.getElementById('content').classList.remove('d-none');
+            document.getElementById('spinner').classList.add('d-none');
+        }
+
+        setTimeout(showContent, 1500);
+    </script>
     <!-- / Layout wrapper -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.2/dist/sweetalert2.all.min.js"></script>
 
@@ -124,6 +151,8 @@
 
     <!-- Page JS -->
     <script src="{{ url('/assets/js/dashboards-analytics.js') }}"></script>
+
+    <script src="{{ url('/assets/modules/select2/js/select2.min.js') }}"></script>
 
 
 </body>

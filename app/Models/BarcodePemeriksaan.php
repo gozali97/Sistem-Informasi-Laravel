@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Barcode extends Model
+class BarcodePemeriksaan extends Model
 {
-    protected $table ='barcode_pemeriksaan';
+    protected $table = 'barcode_pemeriksaan';
+
     protected $primaryKey = 'id';
-    public $incrementing = true; 
-    public $timestamps=true;
+
+    public $incrementing = true;
+    public $timestamps = true;
 
     protected $guarded = [];
 }

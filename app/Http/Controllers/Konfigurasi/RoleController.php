@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Konfigurasi;
 
+use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\RolePermission;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class RoleController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:read konfigurasi');
+        $this->middleware('can:read konfigurasi/roles');
     }
 
     public function index(Request $request)

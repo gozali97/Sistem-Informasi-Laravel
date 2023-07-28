@@ -10,6 +10,7 @@
                 Tambah
             </button>
         </div>
+        <hr class="m-0">
         <div class="table-responsive text-nowrap">
             <div class="p-4">
                 <table class="table table-striped" id="table1">
@@ -47,7 +48,7 @@
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-icon btn-outline-warning"
                                             data-bs-toggle="modal" data-bs-target="#editModal{{ $d->id }}">
-                                            <span class="tf-icons bx bx-pen"></span>
+                                            <span class="tf-icons bx bx-edit"></span>
                                         </button>
                                         <button type="button" class="btn btn-icon btn-outline-danger"
                                             onclick="event.preventDefault(); confirmDelete('{{ $d->id }}');">
@@ -71,19 +72,51 @@
                                             @csrf
                                             <div class="modal-body">
                                                 <div class="row">
-                                                    <div class="col mb-3">
-                                                        <label for="nameWithTitle" class="form-label">Nama Role</label>
-                                                        <input type="text" id="nameWithTitle"
-                                                            value="{{ $d->name }}" name="name"
-                                                            class="form-control" placeholder="Enter Name">
+                                                    <div class="col-md-6 mb-3">
+                                                        <div>
+                                                            <label for="nameWithTitle" class="form-label">Nama
+                                                                Menu</label>
+                                                            <input type="text" id="nameWithTitle"
+                                                                value="{{ $d->name }}" name="name"
+                                                                class="form-control" placeholder="Nama Menu">
+                                                        </div>
+                                                        <div>
+                                                            <label for="nameWithTitle" class="form-label">Icon
+                                                                Menu</label>
+                                                            <input type="text" id="nameWithTitle"
+                                                                value="{{ $d->icon }}" name="icon"
+                                                                class="form-control" placeholder="Icon Menu">
+                                                        </div>
+                                                        <div>
+                                                            <label for="nameWithTitle" class="form-label">Sort</label>
+                                                            <input type="text" id="nameWithTitle"
+                                                                value="{{ $d->sort }}" name="sort"
+                                                                class="form-control" placeholder="Sort">
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col mb-0">
-                                                        <label for="emailWithTitle" class="form-label">Akses</label>
-                                                        <input type="text" id="emailWithTitle"
-                                                            value="{{ $d->guard_name }}" name="guard_name"
-                                                            class="form-control" placeholder="xxxx@xxx.xx">
+                                                    <div class="col-md-6 mb-3">
+                                                        <div>
+
+                                                            <label for="nameWithTitle" class="form-label">Link
+                                                                Menu</label>
+                                                            <input type="text" id="nameWithTitle"
+                                                                value="{{ $d->url }}" name="url"
+                                                                class="form-control" placeholder="Link Menu">
+                                                        </div>
+                                                        <div>
+
+                                                            <label for="nameWithTitle" class="form-label">Main
+                                                                Menu</label>
+                                                            <select name="main_menu" class="form-control"
+                                                                id="">
+                                                                <option value="">-- Pilih --</option>
+                                                                @foreach ($data as $nav)
+                                                                    <option value="{{ $nav->id }}"
+                                                                        {{ $nav->id == $d->main_menu ? 'selected' : '' }}>
+                                                                        {{ $nav->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -120,18 +153,18 @@
                             <div class="col-md-6 mb-3">
                                 <div>
                                     <label for="nameWithTitle" class="form-label">Nama Menu</label>
-                                    <input type="text" id="nameWithTitle" value="{{ old('name') }}" name="name"
-                                        class="form-control" placeholder="Enter username">
+                                    <input type="text" id="nameWithTitle" value="{{ old('name') }}"
+                                        name="name" class="form-control" placeholder="Nama Menu">
                                 </div>
                                 <div>
                                     <label for="nameWithTitle" class="form-label">Icon Menu</label>
-                                    <input type="text" id="nameWithTitle" value="{{ old('icon') }}" name="icon"
-                                        class="form-control" placeholder="Enter username">
+                                    <input type="text" id="nameWithTitle" value="{{ old('icon') }}"
+                                        name="icon" class="form-control" placeholder="Icon Menu">
                                 </div>
                                 <div>
                                     <label for="nameWithTitle" class="form-label">Sort</label>
                                     <input type="text" id="nameWithTitle" value="{{ old('sort') }}"
-                                        name="sort" class="form-control" placeholder="Enter username">
+                                        name="sort" class="form-control" placeholder="Sort">
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -139,7 +172,7 @@
 
                                     <label for="nameWithTitle" class="form-label">Link Menu</label>
                                     <input type="text" id="nameWithTitle" value="{{ old('url') }}"
-                                        name="url" class="form-control" placeholder="Enter username">
+                                        name="url" class="form-control" placeholder="Link Menu">
                                 </div>
                                 <div>
 
