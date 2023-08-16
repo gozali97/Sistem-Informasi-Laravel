@@ -30,13 +30,11 @@ class RoleController extends Controller
         return 'create role';
     }
 
-
     public function store(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|max:255',
-                'guard_name' => 'required|max:255',
             ]);
 
             if ($validator->fails()) {
@@ -44,7 +42,7 @@ class RoleController extends Controller
             }
             Role::create([
                 'name' => $request->name,
-                'guard_name' => $request->guard_name,
+                'guard_name' => 'web',
             ]);
 
             Session::flash('toast_success', 'Data berhasil ditambah');
@@ -60,13 +58,13 @@ class RoleController extends Controller
     public function view($id)
     {
         $data = Role::query()
-            ->join('users', 'users.role_id', 'roles.id')
             ->join('role_has_permissions', 'role_has_permissions.role_id', 'roles.id')
             ->join('permissions', 'permissions.id', 'role_has_permissions.permission_id')
-            ->where('roles.id', $id)->get();
+            ->where('roles.id', $id)
+            ->select('roles.name as name_role', 'role_has_permissions.id', 'permissions.name')
+            ->get();
 
         $role = Role::find($id);
-
 
         $permission = Permission::all();
 
@@ -87,6 +85,17 @@ class RoleController extends Controller
                 return redirect()->back()->withErrors($validator);
             }
 
+            $havePermission = RolePermission::query()
+                ->where('permission_id', $request->permission)
+                ->where('role_id', $request->role_id)
+                ->first();
+
+
+            if ($havePermission) {
+                return redirect()->back()->with('error', 'Gagal mengubah data. Anda sudah memiliki akses tersebut.');
+            }
+
+
             RolePermission::create([
                 'permission_id' => $request->permission,
                 'role_id' => $request->role_id,
@@ -99,6 +108,23 @@ class RoleController extends Controller
             Session::flash('toast_failed', 'Gagal mengubah data. Silakan coba lagi.');
             return redirect()->back();
         }
+    }
+
+    public function deletePermission($id)
+    {
+        $data = RolePermission::find($id);
+
+        if (!$data) {
+            Session::flash('toast_failed', 'Data tidak ditemukan');
+            return redirect()->back();
+        }
+
+        if ($data->delete()) {
+            Session::flash('toast_success', 'Data berhasil dihapus');
+        } else {
+            Session::flash('toast_failed', 'Data gagal dihapus');
+        }
+        return redirect()->back();
     }
 
     public function update(Request $request, $id)
@@ -115,7 +141,6 @@ class RoleController extends Controller
             $data = Role::find($id);
 
             $data->name = $request->name;
-            $data->guard_name = $request->guard_name;
             $data->save();
 
             Session::flash('toast_success', 'Data berhasil diubah');

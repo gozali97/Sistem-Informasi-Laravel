@@ -26,23 +26,24 @@
                     <div class="p-4">
                         <table class="table table-striped" id="table1">
                             <thead>
-                                <tr>
-                                    <th>Action</th>
-                                    <th>Kode Paket</th>
-                                    <th>Nama Paket</th>
+                            <tr>
+                                <th>Action</th>
+                                <th>Kode Paket</th>
+                                <th>Nama Paket</th>
                             </thead>
                             <tbody>
-                                @foreach ($data as $d)
-                                    <tr>
-                                        <td> <button type="button" class="btn btn-icon btn-outline-info btn-info"
+                            @foreach ($data as $d)
+                                <tr>
+                                    <td>
+                                        <button type="button" class="btn btn-icon btn-outline-info btn-info"
                                                 data-lab-kode="{{ $d->lab_kode }}">
-                                                <span class="tf-icons bx bx-info-circle"></span>
-                                            </button>
-                                        </td>
-                                        <td>{{ $d->lab_kode }}</td>
-                                        <td>{{ $d->lab_nama }}</td>
-                                    </tr>
-                                @endforeach
+                                            <span class="tf-icons bx bx-info-circle"></span>
+                                        </button>
+                                    </td>
+                                    <td>{{ $d->lab_kode }}</td>
+                                    <td>{{ $d->lab_nama }}</td>
+                                </tr>
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -59,9 +60,9 @@
                         </div>
                         <div class="col-md-6">
                             <div>
-                                <input type="hidden" name="id" class="form-control" id="id_nilai" />
-                                <input type="hidden" name="lab_kode" class="form-control" id="lab_kode" />
-                                <input type="text" name="nilai" class="form-control" id="nilai" required />
+                                <input type="hidden" name="id" class="form-control" id="id_nilai"/>
+                                <input type="hidden" name="lab_kode" class="form-control" id="lab_kode"/>
+                                <input type="text" name="nilai" class="form-control" id="nilai" required/>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -74,18 +75,18 @@
                     <div class="p-4">
                         <table class="table table-striped" id="table2">
                             <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Kode Lab</th>
-                                    <th>RefSex</th>
-                                    <th>RefBeginAge</th>
-                                    <th>RefEndAge</th>
-                                    <th>Ref</th>
-                                    <th>Ref SIValue</th>
-                                    <th>Start</th>
-                                    <th>End</th>
-                                    <th>RefRange</th>
-                                    <th>Action</th>
+                            <tr>
+                                <th>#</th>
+                                <th>Kode Lab</th>
+                                <th>RefSex</th>
+                                <th>RefBeginAge</th>
+                                <th>RefEndAge</th>
+                                <th>Ref</th>
+                                <th>Ref SIValue</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>RefRange</th>
+                                <th>Action</th>
                             </thead>
                             <tbody id="labReferenceTableBody">
                             </tbody>
@@ -116,10 +117,17 @@
                 showData(lab_kode);
             });
         });
+
+        $(document).ready(function () {
+            $('.btn-outline-info').click(function () {
+                $('.btn-info').addClass('btn-outline-info').removeClass('btn-info');
+                $(this).removeClass('btn-outline-info').addClass('btn-info');
+            });
+        });
     </script>
 
     <script>
-        document.getElementById('updateReference').addEventListener('click', function() {
+        document.getElementById('updateReference').addEventListener('click', function () {
             const idNilai = document.getElementById('id_nilai').value;
             const nilai = document.getElementById('nilai').value;
 
@@ -138,16 +146,16 @@
 
         function saveData(id, nilai) {
             fetch(`/master/labreference/updatereference`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        id: id,
-                        nilai: nilai
-                    })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    id: id,
+                    nilai: nilai
                 })
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -256,26 +264,26 @@
 
     <script>
         @if (session('toast_success'))
-            iziToast.success({
-                title: 'Success',
-                message: '{{ session('toast_success') }}',
-                position: 'topRight'
-            });
+        iziToast.success({
+            title: 'Success',
+            message: '{{ session('toast_success') }}',
+            position: 'topRight'
+        });
         @elseif (session('toast_failed'))
-            iziToast.error({
-                title: 'Failed',
-                message: '{{ session('toast_failed') }}',
-                position: 'topRight'
-            });
+        iziToast.error({
+            title: 'Failed',
+            message: '{{ session('toast_failed') }}',
+            position: 'topRight'
+        });
         @endif
     </script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#table1').DataTable();
             $('#table2').DataTable();
         });
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('.js-example-basic-single').select2();
         });
     </script>

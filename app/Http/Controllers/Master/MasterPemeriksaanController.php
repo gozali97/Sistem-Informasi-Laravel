@@ -20,8 +20,7 @@ class MasterPemeriksaanController extends Controller
 
     public function index(Request $request)
     {
-        $data = Group::query()->where('grup_jenis', 'PRSH')->get();
-
+        $data = Group::query()->where('grup_jenis', 'PRSH')->orderBy('id', 'desc')->get();
 
         return view('master.pemeriksaan.index', compact('data'));
     }
@@ -56,14 +55,14 @@ class MasterPemeriksaanController extends Controller
 
             $data = new Group;
 
-            $data->grup_jenis         = 'PRSH';
-            $data->grup_kode          = $autonumber;
-            $data->grup_nama         = $request->grup_nama;
-            $data->deskripsi       = $request->deskripsi;
-            $data->status           = $request->status;
-            $data->id_client           = 'H002';
-            $data->created_at     = date('Y-m-d H:i:s');
-            $data->updated_at      = date('Y-m-d H:i:s');
+            $data->grup_jenis = 'PRSH';
+            $data->grup_kode = $autonumber;
+            $data->grup_nama = $request->grup_nama;
+            $data->deskripsi = $request->deskripsi;
+            $data->status = $request->status;
+            $data->id_client = 'H002';
+            $data->created_at = date('Y-m-d H:i:s');
+            $data->updated_at = date('Y-m-d H:i:s');
 
             if ($data->save()) {
                 Session::flash('toast_success', 'Data berhasil ditambahkan');
@@ -71,7 +70,7 @@ class MasterPemeriksaanController extends Controller
             }
         } catch (\Exception $e) {
             Log::error('Error creating pemeriksaan: ' . $e->getMessage());
-            Session::flash('toast_failed', 'Gagal mengubah data. Silakan coba lagi.');
+            Session::flash('toast_failed', 'Gagal menambahkan data. Silakan coba lagi.');
             return redirect()->back();
         }
     }
@@ -104,10 +103,10 @@ class MasterPemeriksaanController extends Controller
 
             $data = Group::where('id', $id)->first();
 
-            $data->grup_nama         = $request->grup_nama;
-            $data->deskripsi       = $request->deskripsi;
-            $data->status           = $request->status;
-            $data->updated_at      = date('Y-m-d H:i:s');
+            $data->grup_nama = $request->grup_nama;
+            $data->deskripsi = $request->deskripsi;
+            $data->status = $request->status;
+            $data->updated_at = date('Y-m-d H:i:s');
 
             if ($data->save()) {
                 Session::flash('toast_success', 'Data berhasil diperbarui');

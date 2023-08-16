@@ -38,7 +38,7 @@ class MasterUserMobileController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -49,7 +49,7 @@ class MasterUserMobileController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -60,7 +60,7 @@ class MasterUserMobileController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -71,8 +71,8 @@ class MasterUserMobileController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -115,12 +115,12 @@ class MasterUserMobileController extends Controller
             $user->update_by = Auth::user()->username;
 
             if ($user->save()) {
-                Session::flash('toast_success', 'Data berhasil ditambah');
+                Session::flash('toast_success', 'Data berhasil diubah');
                 return redirect()->route('account.usermobile.index');
             }
         } catch (\Exception $e) {
             Log::error('Error creating role: ' . $e->getMessage());
-            Session::flash('toast_failed', 'Gagal menambahkan data. Silakan coba lagi.');
+            Session::flash('toast_failed', 'Gagal mengubah data. Silakan coba lagi.');
             return redirect()->back();
         }
     }
@@ -128,7 +128,7 @@ class MasterUserMobileController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

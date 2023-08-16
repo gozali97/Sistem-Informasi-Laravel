@@ -25,7 +25,7 @@ class LayananController extends Controller
 
         $grup = Group::query();
         if ($grupJenis) {
-            $grup = $grup->where("grup_jenis", "=",  $grupJenis);
+            $grup = $grup->where("grup_jenis", "=", $grupJenis);
         }
 
         $result = $grup->get();
@@ -51,7 +51,9 @@ class LayananController extends Controller
                 ->join('paket_labs', 'paket_labs.paket_kode', '=', 'paket_hubungs.paket_kode')
                 ->select('tarif_vars.*', 'tarif_labs.*', DB::raw("case when( tarif_labs.periode_start <= '" . $dateNow . "' AND tarif_labs.periode_end >= '" . $dateNow . "' and paket_labs.periode_start <= '" . $dateNow . "' AND paket_labs.periode_end >= '" . $dateNow . "') then tarif_labs.tarif_jalan-tarif_labs.promo_value
                 else 0 end AS HargaPromo"))
-                ->where("tarif_vars.var_seri", "=", "LAB")->get();
+                ->where("tarif_vars.var_seri", "=", "LAB")
+                ->where("tarif_labs.tarif_status", "A")
+                ->get();
 
             return $this->success($result);
         } elseif ($varNama || $tarifNama || $paketNama) {
@@ -62,7 +64,8 @@ class LayananController extends Controller
                 ->select('tarif_vars.var_seri', 'tarif_vars.var_kode', 'tarif_vars.var_nama', 'tarif_vars.path_gambar', 'paket_hubungs.paket_kode', 'paket_labs.paket_kelompok', 'paket_labs.paket_nama', 'paket_labs.paket_jalan', 'paket_labs.paket_status', 'paket_labs.paket_periode', 'paket_labs.paket_diskon', 'paket_labs.path_gambar', 'paket_labs.deskripsi', 'paket_labs.catatan', 'paket_labs.manfaat', 'tarif_labs.tarif_kelompok', 'tarif_vars.var_nama', 'tarif_labs.tarif_nama', 'tarif_labs.tarif_jalan', 'tarif_labs.path_gambar as lab_gambar', 'tarif_labs.promo_value', 'tarif_labs.promo_percent', 'tarif_labs.fix_value', 'tarif_labs.deskripsi as lab_dekripsi', 'tarif_labs.catatan as lab_catatan', 'tarif_labs.manfaat as lab_manfaat', 'tarif_labs.periode_start', 'tarif_labs.periode_end', DB::raw("case when( tarif_labs.periode_start <= '" . $dateNow . "' AND tarif_labs.periode_end >= '" . $dateNow . "' and paket_labs.periode_start <= '" . $dateNow . "' AND paket_labs.periode_end >= '" . $dateNow . "') then tarif_labs.tarif_jalan-tarif_labs.promo_value
                 else 0 end AS HargaPromo"))
                 ->distinct()
-                ->where("tarif_vars.var_seri", "=", "LAB");
+                ->where("tarif_vars.var_seri", "=", "LAB")
+                ->where("tarif_labs.tarif_status", "A");
 
             if ($varNama) {
                 $result = $result->where("var_nama", "=", $varNama);

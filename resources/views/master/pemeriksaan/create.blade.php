@@ -1,4 +1,9 @@
 <x-app-layout>
+    <style>
+        .hide {
+            display: none;
+        }
+    </style>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -9,7 +14,7 @@
             </ul>
         </div>
     @endif
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Master /</span> Paket Laboratorium</h4>
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Master /</span> Tambah Pemeriksaan Laboratorium</h4>
 
     <!-- Basic Bootstrap Table -->
     <div class="card">
@@ -20,15 +25,16 @@
             </a>
         </div>
 
-        <form action="{{ route('pemeriksaan.store') }}" method="POST" enctype="multipart/form-data">
+        <form id="myForm" action="{{ route('pemeriksaan.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <div>
-                            <label for="grup_nama" class="form-label">Nama Pemeriksaan<sup class="text-danger">*</sup></label>
+                            <label for="grup_nama" class="form-label">Nama Pemeriksaan<sup
+                                    class="text-danger">*</sup></label>
                             <input type="text" id="grup_nama" value="{{ old('grup_nama') }}" name="grup_nama"
-                                class="form-control" placeholder="Nama Pemeriksaan" required>
+                                   class="form-control" placeholder="Nama Pemeriksaan" required>
                         </div>
                         <div class="mt-3">
                             <label for="status" class="form-label">Status<sup class="text-danger">*</sup></label>
@@ -43,8 +49,9 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="deskripsi" class="form-label">Deskripsi<sup class="text-danger">*</sup></label>
-                        <textarea id="deskripsi" name="deskripsi" class="form-control" placeholder="Tulis keterangan disini" rows="5"
-                            required>{{ old('deskripsi') }}</textarea>
+                        <textarea id="deskripsi" name="deskripsi" class="form-control"
+                                  placeholder="Tulis keterangan disini" rows="5"
+                                  required>{{ old('deskripsi') }}</textarea>
                         <span id="deskripsi-error" class="text-danger"></span>
 
                     </div>
@@ -52,14 +59,34 @@
 
             </div>
             <div class="card-footer d-flex justify-content-center align-items-center">
-                <button type="submit" class="btn btn-primary">Save changes</button>
+                <button id="submitBtn" type="submit" class="btn btn-primary">Save changes</button>
             </div>
 
         </form>
     </div>
 
     <script>
-        document.getElementById('deskripsi').addEventListener('input', function() {
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("myForm").addEventListener("submit", function () {
+                document.getElementById("submitBtn").classList.add("hide");
+            });
+
+            document.getElementById('grup_nama').addEventListener('input', function () {
+                if (this.value.length > 49) {
+                    this.value = this.value.substring(0, 49);
+                }
+            });
+            document.getElementById('deskripsi').addEventListener('input', function () {
+                if (this.value.length > 254) {
+                    this.value = this.value.substring(0, 254);
+                }
+            });
+
+        });
+    </script>
+
+    <script>
+        document.getElementById('deskripsi').addEventListener('input', function () {
             var input = this.value;
             var minLength = 10;
             var errorElement = document.getElementById('deskripsi-error');
@@ -74,21 +101,21 @@
 
     <script>
         @if (session('toast_success'))
-            iziToast.success({
-                title: 'Success',
-                message: '{{ session('toast_success') }}',
-                position: 'topRight'
-            });
+        iziToast.success({
+            title: 'Success',
+            message: '{{ session('toast_success') }}',
+            position: 'topRight'
+        });
         @elseif (session('toast_failed'))
-            iziToast.error({
-                title: 'Failed',
-                message: '{{ session('toast_failed') }}',
-                position: 'topRight'
-            });
+        iziToast.error({
+            title: 'Failed',
+            message: '{{ session('toast_failed') }}',
+            position: 'topRight'
+        });
         @endif
     </script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#table1').DataTable();
         });
     </script>

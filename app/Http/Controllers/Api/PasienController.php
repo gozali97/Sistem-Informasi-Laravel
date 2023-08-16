@@ -201,8 +201,10 @@ class PasienController extends Controller
 
         $pasien = Pasien::query()
             ->join('user_mobiles', 'user_mobiles.id', 'pasiens.user_mobile_id')
-            ->select('pasien_nomor_rm', 'pasien_nama', 'pasien_gender', 'pasien_alamat', 'pasien_hp', 'pasien_no_id')
+            ->join('admvars', 'admvars.var_kode', 'pasiens.pasien_agama')
+            ->select('pasien_no_id as ktp', 'pasien_nomor_rm', 'pasien_nama', 'pasien_gender', 'pasien_alamat', 'pasien_wilayah', 'pasien_hp', 'pasien_tmp_lahir', 'pasien_tgl_lahir', 'pasien_hp', 'var_nama as agama')
             ->where('pasiens.user_mobile_id', $id)
+            ->where('admvars.var_seri', 'AGAMA')
             ->get();
 
         if ($pasien->count() > 0) {

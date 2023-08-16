@@ -16,80 +16,72 @@
             <div class="p-4">
                 <table class="table table-striped" id="table1">
                     <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nama Role</th>
-                            <th>Akses</th>
-                            <th>Action</th>
-                        </tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama Role</th>
+                        <th>Akses</th>
+                        <th>Action</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        @foreach ($data as $d)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $d->name }}</td>
-                                <td>{{ $d->guard_name }}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-icon btn-outline-warning"
+                    @foreach ($data as $d)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $d->name }}</td>
+                            <td>{{ $d->guard_name }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-icon btn-outline-warning"
                                             data-bs-toggle="modal" data-bs-target="#editModal{{ $d->id }}">
-                                            <span class="tf-icons bx bx-edit"></span>
-                                        </button>
-                                        <a type="button" class="btn btn-icon btn-outline-info"
-                                            href="{{ route('roles.view', $d->id) }}">
-                                            <span class="tf-icons bx bx-info-circle"></span>
-                                        </a>
-                                        <button type="button" class="btn btn-icon btn-outline-danger"
+                                        <span class="tf-icons bx bx-edit"></span>
+                                    </button>
+                                    <a type="button" class="btn btn-icon btn-outline-info"
+                                       href="{{ route('roles.view', $d->id) }}">
+                                        <span class="tf-icons bx bx-info-circle"></span>
+                                    </a>
+                                    <button type="button" class="btn btn-icon btn-outline-danger"
                                             onclick="event.preventDefault(); confirmDelete('{{ $d->id }}');">
-                                            <span class="tf-icons bx bx-trash"></span>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                        <span class="tf-icons bx bx-trash"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
 
-                            <div class="modal fade" id="editModal{{ $d->id }}" tabindex="-1"
-                                style="display: none;" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="modalCenterTitle">Update Role
-                                                {{ $d->name }}</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        <div class="modal fade" id="editModal{{ $d->id }}" tabindex="-1"
+                             style="display: none;" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalCenterTitle">Update Role
+                                            {{ $d->name }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
-                                        </div>
-                                        <form action="{{ route('roles.update', $d->id) }}">
-                                            @csrf
-                                            <div class="modal-body">
-                                                <div class="row">
-                                                    <div class="col mb-3">
-                                                        <label for="nameWithTitle" class="form-label">Nama Role</label>
-                                                        <input type="text" id="nameWithTitle"
-                                                            value="{{ $d->name }}" name="name"
-                                                            class="form-control" placeholder="Enter Name">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col mb-0">
-                                                        <label for="emailWithTitle" class="form-label">Akses</label>
-                                                        <input type="text" id="emailWithTitle"
-                                                            value="{{ $d->guard_name }}" name="guard_name"
-                                                            class="form-control" placeholder="xxxx@xxx.xx">
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-outline-secondary"
-                                                    data-bs-dismiss="modal">
-                                                    Close
-                                                </button>
-                                                <button type="submit" class="btn btn-primary">Save changes</button>
-                                            </div>
-                                        </form>
                                     </div>
+                                    <form action="{{ route('roles.update', $d->id) }}">
+                                        @csrf
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col mb-3">
+                                                    <label for="nameWithTitle" class="form-label">Nama Role<sup
+                                                            class="text-danger">*</sup></label>
+                                                    <input type="text" id="nameWithTitle"
+                                                           value="{{ $d->name }}" name="name"
+                                                           class="form-control" placeholder="Enter Name" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                    data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">Save changes</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-                        @endforeach
+                        </div>
+                    @endforeach
                     </tbody>
                 </table>
             </div>
@@ -108,19 +100,12 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col mb-3">
-                                <label for="nameWithTitle" class="form-label">Nama Role</label>
+                                <label for="nameWithTitle" class="form-label">Nama Role<sup
+                                        class="text-danger">*</sup></label>
                                 <input type="text" id="nameWithTitle" value="{{ old('name') }}" name="name"
-                                    class="form-control" placeholder="Enter username">
+                                       class="form-control" placeholder="nama role" required>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col mb-0">
-                                <label for="emailWithTitle" class="form-label">Akses</label>
-                                <input type="text" id="emailWithTitle" value="{{ old('guard_name') }}"
-                                    name="guard_name" class="form-control" placeholder="Akses web">
-                            </div>
-                        </div>
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -134,21 +119,21 @@
     </div>
     <script>
         @if (session('toast_success'))
-            iziToast.success({
-                title: 'Success',
-                message: '{{ session('toast_success') }}',
-                position: 'topRight'
-            });
+        iziToast.success({
+            title: 'Success',
+            message: '{{ session('toast_success') }}',
+            position: 'topRight'
+        });
         @elseif (session('toast_failed'))
-            iziToast.error({
-                title: 'Failed',
-                message: '{{ session('toast_failed') }}',
-                position: 'topRight'
-            });
+        iziToast.error({
+            title: 'Failed',
+            message: '{{ session('toast_failed') }}',
+            position: 'topRight'
+        });
         @endif
     </script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#table1').DataTable();
         });
     </script>
@@ -165,7 +150,7 @@
                 cancelButtonText: "Batal",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = "/master/paketlab/destroy/" + id;
+                    window.location.href = "/konfigurasi/roles/destroy/" + id;
                 }
             });
         }

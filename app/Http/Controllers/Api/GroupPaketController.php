@@ -17,29 +17,43 @@ class GroupPaketController extends Controller
 
     public function index()
     {
-
         $paket = GroupPaket::query()
-        ->select('group_pakets.*')
-        ->get();
+            ->select('group_pakets.*')
+            ->get();
 
         if (!$paket->isEmpty()) {
 
-            $detail = PaketLab::whereIn('paket_labs.paket_kelompok',$paket->pluck('paket_kelompok'))->get();
+            $paketKelompok = $paket->pluck('paket_kelompok');
 
+            $detail = PaketLab::whereIn('paket_labs.paket_kelompok', $paketKelompok)->get();
 
-            $paket = $paket->map(function ($item) use ($detail) {
-                $item->detail = collect($detail)->filter(function ($detailItem) use ($item) {
-                    return $detailItem['paket_kelompok'] == $item->paket_kelompok;
-                })->values();
-                return $item;
+            $paket->each(function ($item) use ($detail) {
+                $item->detail = $detail->where('paket_kelompok', $item->paket_kelompok);
             });
+
+            $data = [];
 
             $paket = $paket->filter(function ($item) {
                 return $item->detail->isNotEmpty();
             });
 
+            $number = 0;
+            foreach ($paket as $p) {
+
+                $data[$number]['group_paket_id'] = $p->group_paket_id;
+                $data[$number]['paket_kelompok'] = $p->paket_kelompok;
+                $data[$number]['nama_group'] = $p->nama_group;
+                $data[$number]['path_gambar'] = $p->path_gambar;
+
+                foreach ($p->detail as $details) {
+                    $data[$number]['detail'][] = $details;
+                }
+                $number++;
+            }
+
+
             if ($paket->isNotEmpty()) {
-                return $this->success($paket);
+                return $this->success($data);
             }
         }
 
@@ -134,39 +148,39 @@ class GroupPaketController extends Controller
         $paketgroup = $request->input('group_paket_id');
         $paketKelompok = $request->input('paket_kelompok');
 
-        if (!$paketKelompok && !$paketgroup ) {
+        if (!$paketKelompok && !$paketgroup) {
             return $this->error("Data tidak ditemukan");
-        }elseif ($paketgroup) {
+        } elseif ($paketgroup) {
             $result = GroupPaket::query()
-            ->join('paket_labs','paket_labs.paket_kelompok', 'group_pakets.paket_kelompok')
-            ->select('group_pakets.group_paket_id','group_pakets.paket_kelompok','group_pakets.nama_paket', 'paket_labs.paket_kode', 'paket_labs.paket_nama', 'paket_labs.paket_jalan','paket_labs.paket_diskon','paket_labs.path_gambar','paket_labs.deskripsi','paket_labs.catatan','paket_labs.manfaat');
+                ->join('paket_labs', 'paket_labs.paket_kelompok', 'group_pakets.paket_kelompok')
+                ->select('group_pakets.group_paket_id', 'group_pakets.paket_kelompok', 'group_pakets.nama_group', 'paket_labs.paket_kode', 'paket_labs.paket_nama', 'paket_labs.paket_jalan', 'paket_labs.paket_diskon', 'paket_labs.path_gambar', 'paket_labs.deskripsi', 'paket_labs.catatan', 'paket_labs.manfaat');
 
-        if ($paketgroup) {
-            $result = $result->where("group_pakets.group_paket_id", "like", "%" . $paketgroup . "%");
-        }
-        if ($paketKelompok) {
-            $result = $result->where("paket_labs.paket_kelompok", "like", "%" . $paketKelompok . "%");
-        }
+            if ($paketgroup) {
+                $result = $result->where("group_pakets.group_paket_id", "like", "%" . $paketgroup . "%");
+            }
+            if ($paketKelompok) {
+                $result = $result->where("paket_labs.paket_kelompok", "like", "%" . $paketKelompok . "%");
+            }
 
-        $result = $result->distinct()->get();
+            $result = $result->distinct()->get();
 
-        foreach ($result as $group) {
-            $item = TarifLab::query()
-                ->join('paket_hubungs','paket_hubungs.tarif_kode', 'tarif_labs.tarif_kode')
-                ->join('paket_labs','paket_labs.paket_kode', 'paket_hubungs.paket_kode')
-                ->select('tarif_labs.tarif_kode', 'tarif_labs.tarif_nama as lab_nama','tarif_labs.tarif_jalan as lab_tarif', 'tarif_labs.promo_value as lab_diskon' ,'tarif_labs.promo_percent as lab_diskon_prs', 'tarif_labs.fix_value as lab_jumlah', 'tarif_labs.tarif_jalan as lab_pribadi')
-                ->where('paket_labs.paket_kode', $group->paket_kode)
-                ->distinct()
-                ->get();
+            foreach ($result as $group) {
+                $item = TarifLab::query()
+                    ->join('paket_hubungs', 'paket_hubungs.tarif_kode', 'tarif_labs.tarif_kode')
+                    ->join('paket_labs', 'paket_labs.paket_kode', 'paket_hubungs.paket_kode')
+                    ->select('tarif_labs.tarif_kode', 'tarif_labs.tarif_nama as lab_nama', 'tarif_labs.tarif_jalan as lab_tarif', 'tarif_labs.promo_value as lab_diskon', 'tarif_labs.promo_percent as lab_diskon_prs', 'tarif_labs.fix_value as lab_jumlah', 'tarif_labs.tarif_jalan as lab_pribadi')
+                    ->where('paket_labs.paket_kode', $group->paket_kode)
+                    ->distinct()
+                    ->get();
 
-            $group->item = $item;
-        }
+                $group->item = $item;
+            }
 
-        if ($result->count() > 0) {
-            return $this->success($result);
-        } else {
-            return $this->error("Data tidak ditemukan");
-        }
+            if ($result->count() > 0) {
+                return $this->success($result);
+            } else {
+                return $this->error("Data tidak ditemukan");
+            }
         }
     }
 

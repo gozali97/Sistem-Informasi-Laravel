@@ -43,29 +43,54 @@ class EmailVerificationController extends Controller
         ]);
     }
 
-    public function resend(Request $request)
+    public function verified(Request $request)
     {
-        $user = UserMobile::find($request->id);
-        if (!$user) {
+        $user = UserMobile::query()->where('id', $request->id)->first();
+
+        if (!$user->email_verified_at) {
             return response()->json([
                 'status' => 'failed',
                 'code' => 404,
-                'message' => 'User tidak ditemukan'
+                'message' => 'Email belum diverifikasi'
             ], 404);
-        }
-        if ($user->hasVerifiedEmail()) {
+        } else {
             return response()->json([
-                'status' => 'failed',
-                'code' => 400,
-                'message' => 'Email sudah diverifikasi sebelumnya'
-            ], 400);
+                'status' => 'success',
+                'message' => 'Email berhasil diverifikasi',
+                'data' => $user
+            ]);
         }
-        $user->sendEmailVerificationNotification();
-        return response()->json([
-            'status' => 'success',
-            'code' => 200,
-            'message' => 'Verifikasi email berhasil dikirim ulang'
-            ], 200);
     }
 
+    public function resend(Request $request)
+    {
+        $user = UserMobile::where('email', $request->email)->first();
+        $user->sendEmailVerificationNotification();
+        return response()->json(['message' => 'Verification email sent']);
+    }
+
+    // public function resend(Request $request)
+    // {
+    //     $user = UserMobile::find($request->id);
+    //     if (!$user) {
+    //         return response()->json([
+    //             'status' => 'failed',
+    //             'code' => 404,
+    //             'message' => 'User tidak ditemukan'
+    //         ], 404);
+    //     }
+    //     if ($user->hasVerifiedEmail()) {
+    //         return response()->json([
+    //             'status' => 'failed',
+    //             'code' => 400,
+    //             'message' => 'Email sudah diverifikasi sebelumnya'
+    //         ], 400);
+    //     }
+    //     $user->sendEmailVerificationNotification();
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'code' => 200,
+    //         'message' => 'Verifikasi email berhasil dikirim ulang'
+    //     ], 200);
+    // }
 }

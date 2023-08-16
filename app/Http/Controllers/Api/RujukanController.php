@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Rujukan;
 use App\Models\RujukanDetail;
+use App\Models\User;
+use App\Models\UserMobile;
 use DateTime;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -58,7 +60,8 @@ class RujukanController extends Controller
             'nama_dokter' => 'required',
             'rumah_sakit' => 'required',
             'pasien_nomor_rm' => 'required',
-            'user_mobile_id' => 'required'
+            'user_mobile_id' => 'required',
+            'file_rujukan' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validasi->fails()) {
@@ -71,34 +74,28 @@ class RujukanController extends Controller
 
             $current_date = date('Y-m-d H:i:s');
 
+            $file  = $request->pasien_nomor_rm . '-' . time() .  '.' . $request->file_rujukan->extension();
+            $path       = $request->file('file_rujukan')->move('storage/rujukan', $file);
+
+
+            $user  = UserMobile::where('id', $request->user_mobile_id)->first();
             $rujukan = Rujukan::create([
                 'pasien_nomor_rm' => $request->pasien_nomor_rm,
                 'user_mobile_id' => $request->user_mobile_id,
                 'rujukan_no' => $this->createNewRujNumber(),
                 'nama_pasien' => $request->nama_pasien,
-                'file_rujukan' => $request->file_rujukan,
+                'file_rujukan' => 'https://staging-lis.k24.co.id/storage/rujukan/' . $file,
                 'nama_dokter' => $request->nama_dokter,
                 'rumah_sakit' => $request->rumah_sakit,
                 'tanggal_transaksi' => $current_date,
                 'status' => 1,
                 'create_date' => $current_date,
-                'create_by' => 'null',
+                'create_by' => $user->nama_lengkap,
                 'update_date' => $current_date,
-                'update_by' => 'null'
+                'update_by' => $user->nama_lengkap
             ]);
-
-            foreach($request->rujukan_details as $detail){
-                RujukanDetail::create([
-                    'rujukan_id' => $rujukan->rujukan_id,
-                    'item_id' => $detail['item_id'],
-                    'status' => 1,
-                    'create_date' => $current_date,
-                    'create_by'=> 'null',
-                ]);
-            }
-
-
         } catch (\Exception $e) {
+            dd($e);
             DB::rollBack();
             return $this->error('Register Gagal');
         }
@@ -106,7 +103,6 @@ class RujukanController extends Controller
         DB::commit();
 
         return $this->success($rujukan);
-
     }
 
     public function show(Request $request)
@@ -114,25 +110,24 @@ class RujukanController extends Controller
         $nomorRM = $request->input('pasien_nomor_rm');
         $mobileID = $request->input('user_mobile_id');
 
-        if (!$nomorRM && ! $mobileID) {
+        if (!$nomorRM && !$mobileID) {
             $result = Rujukan::all();
             return $this->success($result);
         } elseif ($nomorRM || $mobileID) {
-            $result = Rujukan::select()
+
+            $result = Rujukan::query()
                 ->join('pasiens', 'pasiens.pasien_nomor_rm', '=', 'rujukans.pasien_nomor_rm')
                 ->join('user_mobiles', 'user_mobiles.id', '=', 'rujukans.user_mobile_id')
-                ->join('rujukan_details', 'rujukan_details.rujukan_id', '=', 'rujukans.rujukan_id')
-                ->select('rujukans.rujukan_no', 'pasiens.pasien_nomor_rm', 'rujukans.nama_pasien', 'rujukans.tanggal_transaksi', 'rujukans.nama_dokter', 'rujukans.rumah_sakit', 'rujukans.file_rujukan', 'rujukans.status', 'rujukans.create_date', 'rujukans.create_by', 'rujukan_details.status', 'rujukan_details.create_date', 'rujukan_details.create_by')
+                ->select('rujukans.rujukan_no', 'pasiens.pasien_nomor_rm', 'rujukans.nama_pasien', 'rujukans.tanggal_transaksi', 'rujukans.nama_dokter', 'rujukans.rumah_sakit', 'rujukans.file_rujukan', 'rujukans.status', 'rujukans.create_date', 'rujukans.create_by')
                 ->where("rujukans.status", 1);
 
             if ($nomorRM) {
-                $result = $result->where("rujukans.pasien_nomor_rm", "=",$nomorRM);
+                $result = $result->where("rujukans.pasien_nomor_rm", "=", $nomorRM);
             }
 
             if ($mobileID) {
                 $result = $result->where("rujukans.user_mobile_id", "=", $mobileID);
             }
-
 
             $result = $result->get();
 
@@ -184,7 +179,6 @@ class RujukanController extends Controller
             \DB::commit();
             return $this->success($Rujukan);
         }
-
     }
 
     public function success($data, $message = "Berhasil")

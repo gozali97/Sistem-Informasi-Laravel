@@ -34,8 +34,12 @@
                                 <td>{{ $d->paket_nama }}</td>
                                 <td>{{ $d->paket_jalan }}</td>
                                 <td>
-                                    <img src="{{ $d->path_gambar }}" alt class="w-px-40 h-auto rounded-circle" />
-
+                                    @if ($d->path_gambar)
+                                        <img src="{{ url($d->path_gambar) }}" alt class="w-px-50 h-auto rounded" />
+                                    @else
+                                        <img src="https://fakeimg.pl/300x200/071952/FFF/?text=Sample&font=lobster" alt
+                                            class="w-px-50 h-auto rounded" />
+                                    @endif
                                 </td>
                                 @php
                                     $status = 'Tidak Aktif';

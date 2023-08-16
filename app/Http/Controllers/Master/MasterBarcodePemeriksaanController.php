@@ -125,7 +125,7 @@ class MasterBarcodePemeriksaanController extends Controller
             }
         } catch (\Exception $e) {
             Log::error('Error creating barcodepemeriksaan: ' . $e->getMessage());
-            Session::flash('toast_failed', 'Gagal menambahkan data. Silakan coba lagi.');
+            Session::flash('toast_failed', 'Gagal mengubah data. Silakan coba lagi.');
             return redirect()->back();
         }
     }

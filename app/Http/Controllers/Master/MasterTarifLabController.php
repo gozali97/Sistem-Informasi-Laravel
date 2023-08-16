@@ -30,7 +30,7 @@ class MasterTarifLabController extends Controller
         $data = TarifLab::select('tarif_labs.*')
             ->join('paket_hubungs', 'paket_hubungs.tarif_kode', 'tarif_labs.tarif_kode')
             ->join('paket_labs', 'paket_labs.paket_kode', 'paket_hubungs.paket_kode')
-            ->orderby('tarif_kode')
+            ->orderby('id', 'ASC')
             ->distinct();
 
         if (!empty($tarif)) {
@@ -43,7 +43,7 @@ class MasterTarifLabController extends Controller
 
         $data = $data->get();
 
-        $tarif =  TarifVar::query()->where('var_seri', '=', 'LAB')->orderby('var_nama')->get();
+        $tarif = TarifVar::query()->where('var_seri', '=', 'LAB')->orderby('var_nama')->get();
 
         $paket = PaketLab::all();
 
@@ -85,8 +85,8 @@ class MasterTarifLabController extends Controller
                 return back()->withErrors($validasi)->withInput();
             }
 
-            $imageName  = time() . 'tarif' . '.' . $request->gambar->extension();
-            $path       = $request->file('gambar')->move('images/tarif', $imageName);
+            $imageName = '/images/tarif/' . time() . 'tarif' . '.' . $request->gambar->extension();
+            $path = $request->file('gambar')->move('images/tarif', $imageName);
 
             $getlastnumber = TarifLab::select(DB::raw('substring(tarif_kode,3,4) '))
                 ->where('tarif_kelompok', '=', $request->tarif_kelompok)
@@ -103,16 +103,16 @@ class MasterTarifLabController extends Controller
             $tarifkode = sprintf("%02s", $request->tarif_kelompok) . '' . sprintf("%04s", $numbertarifkode);
 
             $data = new TarifLab;
-            $data->tarif_kode    = $tarifkode;
-            $data->tarif_nama    = $request->tarif_nama;
-            $data->tarif_jalan   = $request->tarif_jalan;
+            $data->tarif_kode = $tarifkode;
+            $data->tarif_nama = $request->tarif_nama;
+            $data->tarif_jalan = $request->tarif_jalan;
             $data->tarif_kelompok = $request->tarif_kelompok;
-            $data->deskripsi    = $request->deskripsi;
-            $data->manfaat      = $request->manfaat;
-            $data->catatan      = $request->catatan;
-            $data->path_gambar  = $imageName;
-            $data->tarif_status  = $request->tarif_status;
-            $data->id_client     = 'H002';
+            $data->deskripsi = $request->deskripsi;
+            $data->manfaat = $request->manfaat;
+            $data->catatan = $request->catatan;
+            $data->path_gambar = $imageName;
+            $data->tarif_status = $request->tarif_status;
+            $data->id_client = 'H002';
 
             if ($data->save()) {
 
@@ -167,24 +167,26 @@ class MasterTarifLabController extends Controller
 
             if ($request->hasFile('gambar')) {
                 // Hapus gambar lama
-                if (file_exists(public_path('images/tarif' . $data->path_gambar))) {
-                    unlink(public_path('images/tarif' . $data->path_gambar));
+
+                $oldImagePath = public_path('images/tarif/' . str_replace('/images/tarif/', '', $data->path_gambar));
+                if (is_file($oldImagePath)) {
+                    unlink($oldImagePath);
                 }
 
                 // Simpan gambar baru
-                $imageName = time() . 'tarif' . '.' . $request->gambar->extension();
+                $imageName = '/images/tarif/' . time() . 'tarif' . '.' . $request->gambar->extension();
                 $path = $request->file('gambar')->move('images/tarif', $imageName);
-                $data->path_gambar = 'https://staging-lis.k24.co.id/images/tarif/' . $imageName;
+                $data->path_gambar = $imageName;
             }
 
 
-            $data->tarif_nama    = $request->tarif_nama;
-            $data->tarif_jalan   = $request->tarif_jalan;
+            $data->tarif_nama = $request->tarif_nama;
+            $data->tarif_jalan = $request->tarif_jalan;
             $data->tarif_kelompok = $request->tarif_kelompok;
-            $data->deskripsi    = $request->deskripsi;
-            $data->manfaat      = $request->manfaat;
-            $data->catatan      = $request->catatan;
-            $data->tarif_status  = $request->tarif_status;
+            $data->deskripsi = $request->deskripsi;
+            $data->manfaat = $request->manfaat;
+            $data->catatan = $request->catatan;
+            $data->tarif_status = $request->tarif_status;
 
             if ($data->save()) {
 
@@ -208,7 +210,7 @@ class MasterTarifLabController extends Controller
             return redirect()->back();
         }
 
-        $gambarPath = public_path('images/tarif' . $data->path_gambar);
+        $gambarPath = public_path('images/tarif' . str_replace('/images/tarif/', '', $data->path_gambar));
         if (file_exists($gambarPath)) {
             unlink($gambarPath);
         }
@@ -219,5 +221,29 @@ class MasterTarifLabController extends Controller
             Session::flash('toast_failed', 'Data gagal dihapus');
         }
         return redirect()->back();
+    }
+
+    public function getData(Request $request)
+    {
+        $tarif = $request->tarif;
+        $paket = $request->paket;
+
+        $data = TarifLab::select('tarif_labs.*')
+            ->join('paket_hubungs', 'paket_hubungs.tarif_kode', 'tarif_labs.tarif_kode')
+            ->join('paket_labs', 'paket_labs.paket_kode', 'paket_hubungs.paket_kode')
+            ->orderby('id', 'ASC')
+            ->distinct();
+
+        if (!empty($tarif)) {
+            $data = $data->where('tarif_labs.tarif_kelompok', 'ilike', '%' . $tarif . '%');
+        }
+
+        if (!empty($paket)) {
+            $data = $data->where('paket_labs.paket_kode', 'ilike', '%' . $paket . '%');
+        }
+
+        $data = $data->get();
+
+        return response()->json($data);
     }
 }

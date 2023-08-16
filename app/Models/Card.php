@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Card extends Model
 {
-    protected $table 	= 'tkartukrd';
-    public $timestamps 	= false;
+    protected $table = 'tkartukrd';
+    protected $primaryKey = 'kartukrdkode';
+    public $incrementing = false;
+    protected $guarded = [];
+    public $timestamps = false;
 }

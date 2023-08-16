@@ -1,4 +1,9 @@
 <x-app-layout>
+    <style>
+        .hide {
+            display: none;
+        }
+    </style>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -9,114 +14,84 @@
             </ul>
         </div>
     @endif
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Master /</span> Paket Laboratorium</h4>
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Master /</span> Ubah Tentang Kami</h4>
 
     <!-- Basic Bootstrap Table -->
     <div class="card">
         <div class="card-header">
 
-            <a href="{{ route('paketlab.index') }}" type="button" class="btn btn-outline-secondary mt-3">
+            <a href="{{ route('tentangkami.index') }}" type="button" class="btn btn-outline-secondary mt-3">
                 Kembali
             </a>
         </div>
 
-        <form action="{{ route('paketlab.update', $data->paket_kode) }}" method="POST" enctype="multipart/form-data">
+        <form id="myForm" action="{{ route('tentangkami.update', $data->id) }}" method="POST"
+              enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <div>
-                            <label for="group_paket" class="form-label">Group Paket</label>
-                            <select name="group_paket" class="form-control" id="group_paket" required>
-                                <option value="">--Pilih--</option>
-                                @foreach ($groups as $group)
-                                    <option value="{{ $group->paket_kelompok }}"
-                                        {{ $data->paket_kelompok == $group->paket_kelompok ? 'selected' : '' }}>
-                                        {{ $group->nama_group }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <label for="group_paket" class="form-label">Judul<sup class="text-danger">*</sup></label>
+                            <input type="text" id="judul" value="{{ $data->judul }}" name="judul"
+                                   class="form-control" placeholder="Judul" required>
                         </div>
                         <div class="mt-2">
-                            <label for="paket_kode" class="form-label">Kode Paket</label>
-                            <input type="text" id="paket_kode" value="{{ $data->paket_kode }}" name="paket_kode"
-                                class="form-control" placeholder="Paket Kode" readonly>
-                        </div>
-                        <div class="mt-2">
-                            <label for="nama_paket" class="form-label">Nama Paket</label>
-                            <input type="text" id="nama_paket" value="{{ $data->paket_nama }}" name="nama_paket"
-                                class="form-control" placeholder="Nama Paket" required>
+                            <label for="deskripsi" class="form-label">Deskripsi<sup class="text-danger">*</sup></label>
+                            <textarea id="deskripsi" name="deskripsi" class="form-control"
+                                      placeholder="Tulis keterangan disini" rows="3"
+                                      required>{{ $data->deskripsi }}</textarea>
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
                         <div>
-                            <label for="tarif" class="form-label">Tarif</label>
-                            <input type="number" id="tarif"
-                                value="{{ number_format($data->paket_jalan, 0, '.', '') }}" name="tarif"
-                                class="form-control" placeholder="Tarif" required>
-                        </div>
+                            <label for="status" class="form-label">Status<sup class="text-danger">*</sup></label>
+                            <select name="status" class="form-control" id="status" required>
+                                <option value="">--Pilih--</option>
+                                <option value="A" {{ $data->status == 'A' ? 'selected' : '' }}>Aktif
+                                </option>
+                                <option value="N" {{ $data->status == 'N' ? 'selected' : '' }}>Tidak Aktif
+                                </option>
+                            </select>
 
+                        </div>
                         <div class="mt-2">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label for="formFile" class="form-label">Gambar</label>
+                                    <label for="formFile" class="form-label">Gambar<sup
+                                            class="text-danger">*</sup></label>
                                     <input class="form-control" type="file" name="gambar" id="formFile"
-                                        accept=".jpg, .png" />
+                                           accept=".jpg, .png"/>
                                 </div>
                                 <div class="col-md-6">
-                                    <img id="preview" src="{{ $data->path_gambar }}" alt=""
-                                        style="max-width: 125%; max-height: 65px;">
+                                    <img id="preview" class="mt-2"
+                                         src="{{ url('/images/tentangkami', $data->gambar) }}" alt=""
+                                         style="max-width: 250%; max-height: 100px;">
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-2">
-                            <label for="status" class="form-label">Status</label>
-                            <select name="status" class="form-control" id="status" required>
-                                <option value="">--Pilih--</option>
-                                <option value="A" {{ $data->paket_status == 'A' ? 'selected' : '' }}>Aktif
-                                </option>
-                                <option value="N" {{ $data->paket_status == 'N' ? 'selected' : '' }}>Tidak Aktif
-                                </option>
-                            </select>
-                        </div>
 
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="mt-2">
-                            <label for="deskripsi" class="form-label">Deskripsi</label>
-                            <textarea id="deskripsi" name="deskripsi" class="form-control" placeholder="Tulis keterangan disini" rows="3"
-                                required>{{ $data->deskripsi }}</textarea>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="mt-2">
-                            <label for="catatan" class="form-label">Catatan</label>
-                            <textarea id="catatan" name="catatan" class="form-control" placeholder="Tulis keterangan disini" rows="3"
-                                required>{{ $data->catatan }}</textarea>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="mt-2">
-                            <label for="manfaat" class="form-label">Manfaat</label>
-                            <textarea id="manfaat" name="manfaat" class="form-control" placeholder="Tulis keterangan disini" rows="3"
-                                required>{{ $data->manfaat }}</textarea>
-                        </div>
                     </div>
                 </div>
 
             </div>
             <div class="card-footer d-flex justify-content-center align-items-center">
-                <button type="submit" class="btn btn-primary">Save changes</button>
+                <button id="submitBtn" type="submit" class="btn btn-primary">Save changes</button>
             </div>
 
         </form>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("myForm").addEventListener("submit", function () {
+                document.getElementById("submitBtn").classList.add("hide");
+            });
+        });
+    </script>
 
     <script>
         // Membuat event listener change pada input file
-        document.getElementById("formFile").addEventListener("change", function(event) {
+        document.getElementById("formFile").addEventListener("change", function (event) {
             // Mendapatkan file yang diupload
             let file = event.target.files[0];
 
@@ -124,7 +99,7 @@
             let reader = new FileReader();
 
             // Membuat event listener untuk ketika file selesai dibaca
-            reader.addEventListener("load", function() {
+            reader.addEventListener("load", function () {
                 // Mengganti sumber gambar pada elemen img dengan gambar yang sudah dipilih
                 document.getElementById("preview").src = reader.result;
             }, false);
@@ -138,23 +113,21 @@
 
     <script>
         @if (session('toast_success'))
-            iziToast.success({
-                title: 'Success',
-                message: '{{ session('
-                                                                                                                                                                                                                                                            toast_success ') }}',
-                position: 'topRight'
-            });
+        iziToast.success({
+            title: 'Success',
+            message: '{{ session('toast_success') }}',
+            position: 'topRight'
+        });
         @elseif (session('toast_failed'))
-            iziToast.error({
-                title: 'Failed',
-                message: '{{ session('
-                                                                                                                                                                                                                                                            toast_failed ') }}',
-                position: 'topRight'
-            });
+        iziToast.error({
+            title: 'Failed',
+            message: '{{ session('toast_failed') }}',
+            position: 'topRight'
+        });
         @endif
     </script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#table1').DataTable();
         });
     </script>

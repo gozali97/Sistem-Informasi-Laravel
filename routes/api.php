@@ -38,7 +38,7 @@ use App\Mail\SendEmail;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
@@ -57,8 +57,10 @@ Route::post('/user/profile', [UserMobileController::class, 'show'])->name('api.u
 
 //verifikasi email
 Route::post('/email/sendCode', [EmailVerificationController::class, 'send'])->name('api.kirimKode');
-Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
-Route::post('email/resend/{id}', [EmailVerificationController::class, 'resend'])->name('verification.resend');
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
+Route::post('/email/verified', [EmailVerificationController::class, 'verified'])->name('verification.verified');
+Route::post('/email/resend', [EmailVerificationController::class, 'resend'])->name('verification.resend');
+// Route::post('/email/resend/{id}', [EmailVerificationController::class, 'resend'])->name('verification.resend');
 
 //change password
 Route::post('/forgot-password', [UserMobileController::class, 'forgotPassword'])->name('api.forgot_password');

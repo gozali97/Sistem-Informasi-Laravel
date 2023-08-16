@@ -19,10 +19,10 @@ class CreateUsersTable extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->integer('role_id')->nullable();
-            $table->string('tacces_code');
+            $table->string('tacces_code')->nullable();
             $table->string('tunit_code')->nullable();
             $table->string('tpelaku_kode')->nullable();
-            $table->string('idlab');
+            $table->string('idlab')->nullable();
             $table->string('foto')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();

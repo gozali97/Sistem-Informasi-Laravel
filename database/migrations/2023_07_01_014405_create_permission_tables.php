@@ -28,6 +28,7 @@ class CreatePermissionTables extends Migration
         Schema::create($tableNames['permissions'], function (Blueprint $table) {
             $table->bigIncrements('id'); // permission id
             $table->string('name');       // For MySQL 8.0 use string('name', 125);
+            $table->integer('navigation_id')->nullable();
             $table->string('guard_name'); // For MySQL 8.0 use string('guard_name', 125);
             $table->timestamps();
 
@@ -75,6 +76,8 @@ class CreatePermissionTables extends Migration
                     'model_has_permissions_permission_model_type_primary'
                 );
             }
+
+            $table->timestamps();
         });
 
         Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames, $teams) {
@@ -102,6 +105,7 @@ class CreatePermissionTables extends Migration
                     'model_has_roles_role_model_type_primary'
                 );
             }
+            $table->timestamps();
         });
 
         Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {

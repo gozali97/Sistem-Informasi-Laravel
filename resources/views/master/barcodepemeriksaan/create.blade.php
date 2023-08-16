@@ -1,5 +1,9 @@
 <x-app-layout>
-
+    <style>
+        .hide {
+            display: none;
+        }
+    </style>
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -9,7 +13,7 @@
             </ul>
         </div>
     @endif
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Master /</span> Barcode Pemeriksaan</h4>
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Master /</span> Tambah Barcode Pemeriksaan</h4>
 
     <!-- Basic Bootstrap Table -->
     <div class="card">
@@ -20,7 +24,7 @@
             </a>
         </div>
 
-        <form action="{{ route('barcodepemeriksaan.store') }}" method="POST" enctype="multipart/form-data">
+        <form id="myForm" action="{{ route('barcodepemeriksaan.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <div class="row">
@@ -28,12 +32,12 @@
                         <div>
                             <label for="nama" class="form-label">Nama<sup class="text-danger">*</sup></label>
                             <input type="text" id="nama" value="{{ old('nama') }}" name="nama"
-                                class="form-control" placeholder="Nama" required>
+                                   class="form-control" placeholder="Nama" required>
                         </div>
                         <div class="mt-2">
                             <label for="sign" class="form-label">Sign<sup class="text-danger">*</sup></label>
                             <input type="text" id="sign" value="{{ old('sign') }}" name="sign"
-                                class="form-control" placeholder="Sign" required>
+                                   class="form-control" placeholder="Sign" required>
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
@@ -41,12 +45,12 @@
                             <label for="instrument" class="form-label">Tnstrument<sup
                                     class="text-danger">*</sup></label>
                             <input type="text" id="instrument" value="{{ old('instrument') }}" name="instrument"
-                                class="form-control" placeholder="instrument" required>
+                                   class="form-control" placeholder="instrument" required>
                         </div>
                         <div class="mt-2">
                             <label for="copy" class="form-label">Copy<sup class="text-danger">*</sup></label>
                             <input type="text" id="copy" value="{{ old('copy') }}" name="copy"
-                                class="form-control" placeholder="Copy" required>
+                                   class="form-control" placeholder="Copy" required>
                         </div>
 
                     </div>
@@ -54,29 +58,36 @@
 
             </div>
             <div class="card-footer d-flex justify-content-center align-items-center">
-                <button type="submit" class="btn btn-primary">Save changes</button>
+                <button id="submitBtn" type="submit" class="btn btn-primary">Save changes</button>
             </div>
 
         </form>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("myForm").addEventListener("submit", function () {
+                document.getElementById("submitBtn").classList.add("hide");
+            });
+        });
+    </script>
 
     <script>
         @if (session('toast_success'))
-            iziToast.success({
-                title: 'Success',
-                message: '{{ session('toast_success') }}',
-                position: 'topRight'
-            });
+        iziToast.success({
+            title: 'Success',
+            message: '{{ session('toast_success') }}',
+            position: 'topRight'
+        });
         @elseif (session('toast_failed'))
-            iziToast.error({
-                title: 'Failed',
-                message: '{{ session('toast_failed') }}',
-                position: 'topRight'
-            });
+        iziToast.error({
+            title: 'Failed',
+            message: '{{ session('toast_failed') }}',
+            position: 'topRight'
+        });
         @endif
     </script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#table1').DataTable();
         });
     </script>

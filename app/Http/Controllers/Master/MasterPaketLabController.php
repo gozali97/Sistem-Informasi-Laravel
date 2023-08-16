@@ -23,7 +23,6 @@ class MasterPaketLabController extends Controller
     {
         $data = PaketLab::all();
 
-
         return view('master.paketlab.index', compact('data'));
     }
 
@@ -56,7 +55,7 @@ class MasterPaketLabController extends Controller
         try {
             $validasi = Validator::make($request->all(), [
                 'nama_paket' => 'required',
-                'gambar'     => 'required|image|mimes:png,jpg,jpeg|max:5048',
+                'gambar' => 'required|image|mimes:png,jpg,jpeg|max:5048',
                 'group_paket' => 'required',
                 'tarif' => 'required',
                 'deskripsi' => 'required',
@@ -78,26 +77,26 @@ class MasterPaketLabController extends Controller
             }
 
             $data = new PaketLab;
-            $imageName  = time() . 'paket' . '.' . $request->gambar->extension();
-            $path       = $request->file('gambar')->move('images/paket', $imageName);
+            $imageName = '/images/paket/' . time() . 'paket' . '.' . $request->gambar->extension();
+            $path = $request->file('gambar')->move('images/paket', $imageName);
 
             $data->paket_kode = $request->paket_kode;
             $data->paket_kelompok = $request->group_paket;
-            $data->paket_nama    = $request->nama_paket;
-            $data->paket_jalan   = preg_replace('/[Rp. ]/', '', $request->tarif);
-            $data->path_gambar  = 'https://staging-lis.k24.co.id/images/paket/' . $imageName;
+            $data->paket_nama = $request->nama_paket;
+            $data->paket_jalan = preg_replace('/[Rp. ]/', '', $request->tarif);
+            $data->path_gambar = $imageName;
             $data->paket_utama = 0;
             $data->paket_vip = 0;
             $data->paket_kelas_1 = 0;
             $data->paket_kelas_2 = 0;
             $data->paket_kelas_3 = 0;
-            $data->deskripsi    = $request->deskripsi;
-            $data->manfaat      = $request->manfaat;
-            $data->catatan      = $request->catatan;
-            $data->created_at   = date('Y-m-d H:i:s');
-            $data->updated_at   = date('Y-m-d H:i:s');
+            $data->deskripsi = $request->deskripsi;
+            $data->manfaat = $request->manfaat;
+            $data->catatan = $request->catatan;
+            $data->created_at = date('Y-m-d H:i:s');
+            $data->updated_at = date('Y-m-d H:i:s');
             $data->paket_status = $request->status;
-            $data->id_client     = 'H002';
+            $data->id_client = 'H002';
             $data->paket_periode = date('Y-m-d H:i:s');
 
             $data->save();
@@ -168,32 +167,33 @@ class MasterPaketLabController extends Controller
 
             if ($request->hasFile('gambar')) {
                 // Hapus gambar lama
-                if (file_exists(public_path('images/paket' . $data->path_gambar))) {
-                    unlink(public_path('images/paket' . $data->path_gambar));
+                $oldImagePath = public_path('images/paket/' . str_replace('/images/paket/', '', $data->path_gambar));
+                if (is_file($oldImagePath)) {
+                    unlink($oldImagePath);
                 }
 
                 // Simpan gambar baru
-                $imageName = time() . 'paket' . '.' . $request->gambar->extension();
+                $imageName = '/images/paket/' . time() . 'paket' . '.' . $request->gambar->extension();
                 $path = $request->file('gambar')->move('images/paket', $imageName);
-                $data->path_gambar = 'https://staging-lis.k24.co.id/images/paket/' . $imageName;
+                $data->path_gambar = $imageName;
             }
 
             $data->paket_kode = $request->paket_kode;
             $data->paket_kelompok = $request->group_paket;
-            $data->paket_nama    = $request->nama_paket;
-            $data->paket_jalan   = preg_replace('/[Rp. ]/', '', $request->tarif);
+            $data->paket_nama = $request->nama_paket;
+            $data->paket_jalan = preg_replace('/[Rp. ]/', '', $request->tarif);
             $data->paket_utama = 0;
             $data->paket_vip = 0;
             $data->paket_kelas_1 = 0;
             $data->paket_kelas_2 = 0;
             $data->paket_kelas_3 = 0;
-            $data->deskripsi    = $request->deskripsi;
-            $data->manfaat      = $request->manfaat;
-            $data->catatan      = $request->catatan;
-            $data->created_at   = date('Y-m-d H:i:s');
-            $data->updated_at   = date('Y-m-d H:i:s');
+            $data->deskripsi = $request->deskripsi;
+            $data->manfaat = $request->manfaat;
+            $data->catatan = $request->catatan;
+            $data->created_at = date('Y-m-d H:i:s');
+            $data->updated_at = date('Y-m-d H:i:s');
             $data->paket_status = $request->status;
-            $data->id_client     = 'H002';
+            $data->id_client = 'H002';
             $data->paket_periode = date('Y-m-d H:i:s');
 
             $data->save();
@@ -217,7 +217,7 @@ class MasterPaketLabController extends Controller
             return redirect()->back();
         }
 
-        $gambarPath = public_path('images/paket' . $data->path_gambar);
+        $gambarPath = public_path('images/paket' . str_replace('/images/paket/', '', $data->path_gambar));
         if (file_exists($gambarPath)) {
             unlink($gambarPath);
         }

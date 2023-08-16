@@ -22,9 +22,13 @@ class NavigationController extends Controller
 
     public function index(Request $request)
     {
-        $data = Navigation::query()
-            ->orWhereNull('main_menu')
-            ->get();
+        $data = Navigation::all();
+
+        // $menu = Navigation::query()
+        //     ->orWhereNull('main_menu')
+        //     -s
+        //     ->get();
+
         return view('konfigurasi.navigasi.index', compact('data'));
     }
 

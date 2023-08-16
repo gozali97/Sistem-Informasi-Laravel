@@ -18,18 +18,21 @@ class TampilInformasi extends Controller
     public function index()
     {
         $info = Informasi::query()
-        ->select('judul_informasi', 'alamat_url', 'path_gambar')
-        ->where('status', 1)->get();
-        if($info->count() > 0){
+            ->select('judul_informasi', 'informasi', 'alamat_url', 'path_gambar')
+            ->where('status', 'A')->get();
+
+        if ($info->count() > 0) {
             return $this->success($info);
         }
+
         return $this->error("Data tidak ditemukan");
     }
 
-    public function banner(){
+    public function banner()
+    {
         $banner = Banner::query()
-        ->select('judul_banner', 'path_banner')->where("status", "=", 1)->get();
-        if ($banner->count() > 0){
+            ->select('judul_banner', 'path_banner')->where("status", "=", 'A')->get();
+        if ($banner->count() > 0) {
             return $this->success($banner);
         }
 
@@ -39,7 +42,7 @@ class TampilInformasi extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -50,7 +53,7 @@ class TampilInformasi extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -61,8 +64,8 @@ class TampilInformasi extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -73,13 +76,14 @@ class TampilInformasi extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
         //
     }
+
     public function success($data, $message = "Berhasil")
     {
         return response()->json([

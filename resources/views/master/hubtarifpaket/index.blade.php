@@ -10,38 +10,36 @@
             width: 100% !important;
         }
     </style>
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Master /</span> Hubungan Tarif Dan Paket Laboratorium
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Master /</span> Hubungan Tarif Dan Paket
+        Laboratorium
     </h4>
 
     <!-- Basic Bootstrap Table -->
 
     <div class="card">
-        {{-- <div class="card-header">
-
-            <a href="{{ route('hubtarifpemeriksaan.add') }}" type="button" class="btn btn-primary mt-3">
-                Tambah
-            </a>
-        </div> --}}
-
         <div class="card-body">
             <div class="mx-4">
                 <form action="{{ route('hubtarifpaket.index') }}" method="GET">
                     @csrf
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div>
-                                <label for="paket_kode" class="form-label">Paket Laboratorium</label>
-                                <select name="paket_kode" class="js-example-basic-single custom-select form-control"
-                                    id="paket_kode">
-                                    <option value="">--Pilih--</option>
-                                    @foreach ($paket as $p)
-                                        <option value="{{ $p->paket_kode }}">{{ $p->paket_nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal"
+                                    data-bs-target="#modalAdd">
+                                Tambah
+                            </button>
                         </div>
-                        <div class="col-md-8 mt-2">
-                            <Button type="submit" class="btn btn-primary mt-4">Tampil</Button>
+                        <div class="col-md-2 mt-4">
+                            <label for="paket_kode" class="form-label">Paket Laboratorium : </label>
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <select name="paket_kode"
+                                    class="js-example-basic-single custom-select form-control"
+                                    id="paket_kode">
+                                <option value="">--Pilih--</option>
+                                @foreach ($paket as $p)
+                                    <option value="{{ $p->paket_kode }}">{{ $p->paket_nama }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </form>
@@ -49,75 +47,101 @@
         </div>
         <div class="table-responsive text-nowrap">
             <div class="p-4">
-                <table class="table table-striped" id="table1">
+                <table class="table table-striped">
                     <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Paket Kode </th>
-                            <th>Tarif Kode</th>
-                            <th>Nama</th>
-                            <th>Action</th>
+                    <tr>
+                        <th>#</th>
+                        <th>Paket Kode</th>
+                        <th>Tarif Kode</th>
+                        <th>Nama</th>
+                        <th>Action</th>
                     </thead>
-                    <tbody>
-                        @foreach ($data as $d)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $d->paket_kode }}</td>
-                                <td>{{ $d->tarif_kode }}</td>
-                                <td>{{ $d->tarif_nama }}</td>
-                                <td><a type="button" class="btn btn-icon btn-outline-info"
-                                        href="{{ route('hubtarifpemeriksaan.view', $d->id) }}">
-                                        <span class="tf-icons bx bx-info-circle"></span>
-                                    </a></td>
-                            </tr>
-                        @endforeach
+                    <tbody id="tabelData">
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+    @include('master.hubtarifpaket.modalinfo')
+    @include('master.hubtarifpaket.modalAdd')
 
     <script>
         @if (session('toast_success'))
-            iziToast.success({
-                title: 'Success',
-                message: '{{ session('toast_success') }}',
-                position: 'topRight'
-            });
+        iziToast.success({
+            title: 'Success',
+            message: '{{ session('toast_success') }}',
+            position: 'topRight'
+        });
         @elseif (session('toast_failed'))
-            iziToast.error({
-                title: 'Failed',
-                message: '{{ session('toast_failed') }}',
-                position: 'topRight'
-            });
+        iziToast.error({
+            title: 'Failed',
+            message: '{{ session('toast_failed') }}',
+            position: 'topRight'
+        });
         @endif
     </script>
     <script>
-        $(document).ready(function() {
-            $('#table1').DataTable();
-        });
+        function editForm(url) {
+            $('#modalInfo').modal('show');
+            $('#modalInfo .modal-title').text('Detail Pemeriksaan Lab');
 
-        $(document).ready(function() {
-            $('.js-example-basic-single').select2();
-        });
-    </script>
-
-    <script>
-        function confirmDelete(id) {
-            Swal.fire({
-                title: "Apakah Anda yakin?",
-                text: "Data yang dihapus tidak bisa dikembalikan!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Ya, hapus!",
-                cancelButtonText: "Batal",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "/master/tariflab/destroy/" + id;
+            $.get(url).done((response) => {
+                $('#modalInfo [name=paket_nama]').val(response.paket_nama);
+                $('#modalInfo [name=tarif_nama]').val(response.tarif_nama);
+                $('#modalInfo [name=tarif_jalan]').val(response.tarif_jalan);
+                var status = 'Tidak Aktif';
+                if (response.tarif_status == 'A') {
+                    status = 'Aktif'
                 }
-            });
+                $('#modalInfo [name=tarif_status]').val(status);
+                $('#modalInfo [name=catatan]').val(response.catatan);
+                $('#modalInfo [name=deskripsi]').val(response.deskripsi);
+                $('#modalInfo [name=manfaat]').val(response.manfaat);
+            }).fail((errors) => {
+                alert('tidak ada  data');
+                return;
+            })
         }
+
+        $(document).ready(function () {
+            $('.js-example-basic-single').select2();
+
+            dataTable = $('.table').DataTable({
+                processing: true,
+                autoWidth: false,
+                serverSide: true,
+                ajax: {
+                    url: '{{ route('hubtarifpaket.getData') }}',
+                    data: function (d) {
+                        d.paket_kode = $('#paket_kode').val();
+                    }
+                },
+                columns: [
+                    {
+                        data: 'DT_RowIndex', searchable: false, sortable: false
+                    },
+                    {
+                        data: 'paket_kode'
+                    },
+                    {
+                        data: 'tarif_kode'
+                    },
+                    {
+                        data: 'tarif_nama'
+                    },
+                    {
+                        data: 'aksi',
+                        searchable: false,
+                        sortable: false
+                    },
+                ]
+            });
+
+            $('#paket_kode').on('change', function () {
+                dataTable.ajax.reload();
+            });
+
+        });
     </script>
+
 </x-app-layout>

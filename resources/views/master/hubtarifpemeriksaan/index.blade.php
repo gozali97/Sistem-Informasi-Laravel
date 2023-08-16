@@ -32,16 +32,13 @@
                             <div>
                                 <label for="kode" class="form-label">Kelompok Tarif</label>
                                 <select name="kode" class="js-example-basic-single custom-select form-control"
-                                    id="kode">
+                                        id="kode">
                                     <option value="">--Pilih--</option>
                                     @foreach ($kode as $k)
                                         <option value="{{ $k->var_kode }}">{{ $k->var_nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                        </div>
-                        <div class="col-md-8 mt-2">
-                            <Button type="submit" class="btn btn-primary mt-4">Tampil</Button>
                         </div>
                     </div>
                 </form>
@@ -51,52 +48,95 @@
             <div class="p-4">
                 <table class="table table-striped" id="table1">
                     <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Kode</th>
-                            <th>Nama</th>
-                            <th>Action</th>
+                    <tr>
+                        <th>#</th>
+                        <th>Kode</th>
+                        <th>Nama</th>
+                        <th>Tarif Lab</th>
+                        <th>Action</th>
                     </thead>
-                    <tbody>
-                        @foreach ($data as $d)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $d->tarif_kode }}</td>
-                                <td>{{ $d->tarif_nama }}</td>
-                                <td><a type="button" class="btn btn-icon btn-outline-info"
-                                        href="{{ route('hubtarifpemeriksaan.view', $d->id) }}">
-                                        <span class="tf-icons bx bx-info-circle"></span>
-                                    </a></td>
-                            </tr>
-                        @endforeach
+                    <tbody id="tabelData">
+
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
+    @include('master.hubtarifpemeriksaan.modalinfo')
     <script>
         @if (session('toast_success'))
-            iziToast.success({
-                title: 'Success',
-                message: '{{ session('toast_success') }}',
-                position: 'topRight'
-            });
+        iziToast.success({
+            title: 'Success',
+            message: '{{ session('toast_success') }}',
+            position: 'topRight'
+        });
         @elseif (session('toast_failed'))
-            iziToast.error({
-                title: 'Failed',
-                message: '{{ session('toast_failed') }}',
-                position: 'topRight'
-            });
+        iziToast.error({
+            title: 'Failed',
+            message: '{{ session('toast_failed') }}',
+            position: 'topRight'
+        });
         @endif
     </script>
     <script>
-        $(document).ready(function() {
-            $('#table1').DataTable();
-        });
+        function editForm(url) {
+            $('#modalInfo').modal('show');
+            $('#modalInfo .modal-title').text('Detail Pemeriksaan Lab');
 
-        $(document).ready(function() {
+            $.get(url).done((response) => {
+                $('#modalInfo [name=tarif_tipe]').val(response.tarif_tipe);
+                $('#modalInfo [name=tarif_nama]').val(response.tarif_nama);
+                $('#modalInfo [name=tarif_jalan]').val(response.tarif_jalan);
+                var status = 'Tidak Aktif';
+                if (response.tarif_status == 'A') {
+                    status = 'Aktif'
+                }
+                $('#modalInfo [name=tarif_status]').val(status);
+                $('#modalInfo [name=catatan]').val(response.catatan);
+                $('#modalInfo [name=deskripsi]').val(response.deskripsi);
+                $('#modalInfo [name=manfaat]').val(response.manfaat);
+            }).fail((errors) => {
+                alert('tidak ada  data');
+                return;
+            })
+        }
+
+        $(document).ready(function () {
             $('.js-example-basic-single').select2();
+            dataTable = $('.table').DataTable({
+                processing: true,
+                autoWidth: false,
+                serverSide: true,
+                ajax: {
+                    url: '{{ route('hubtarifpemeriksaan.getData') }}',
+                    data: function (d) {
+                        d.kode = $('#kode').val();
+                    }
+                },
+                columns: [
+                    {
+                        data: 'DT_RowIndex', searchable: false, sortable: false
+                    },
+                    {
+                        data: 'tarif_kode'
+                    },
+                    {
+                        data: 'tarif_nama'
+                    }, {
+                        data: 'tarif_jalan'
+                    },
+                    {
+                        data: 'aksi',
+                        searchable: false,
+                        sortable: false
+                    },
+                ]
+            });
+
+            $('#kode').on('change', function () {
+                dataTable.ajax.reload();
+            });
+
         });
     </script>
 

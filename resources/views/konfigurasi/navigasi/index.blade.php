@@ -40,7 +40,7 @@
                                             ->first();
                                         $name = $menu->name;
                                     }
-                                    
+
                                 @endphp
                                 <td>{{ $name }}</td>
                                 <td>{{ $d->sort }}</td>

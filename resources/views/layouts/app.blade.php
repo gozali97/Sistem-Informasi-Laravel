@@ -69,10 +69,10 @@
 <body>
     <div id="spinner" class="layout-wrapper d-flex justify-content-center">
         <div class="d-flex flex-column justify-content-center align-items-center">
-            <div class="spinner-border" role="status">
+            <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <div class="mt-1">Loading . . .</div>
+            <div class="mt-1 text-dark">Loading . . .</div>
         </div>
     </div>
     <div id="content" class="layout-wrapper layout-content-navbar hidden d-none">
