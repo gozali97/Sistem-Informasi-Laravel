@@ -27,7 +27,6 @@ class MasterHubTarifPaketController extends Controller
         $lab = TarifLab::query()->where('tarif_status', 'A')->orderBy('id', 'desc')->get();
         $tarif = TarifVar::query()->where('var_seri', '=', 'LAB')->orderby('var_nama')->get();
 
-
         return view('master.hubtarifpaket.index', compact('paket', 'tarif', 'lab'));
     }
 

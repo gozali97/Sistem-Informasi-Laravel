@@ -34,36 +34,14 @@ class InputHasilLabController extends Controller
 
     public function index()
     {
-        $data = Transaksi::query()
-            ->join('perusahaans', 'perusahaans.prsh_kode', 'transaksis.prsh_kode')
-            ->orderBy('transaksi_id', "DESC")
-            ->where('transaksis.lab_byr_jenis', 1)
-            ->get();
-
-        $labNomor = $data->pluck('lab_nomor');
-
-        $detail = TransaksiDetail::query()
-            ->join('transaksis', 'transaksis.lab_nomor', 'transaksi_details.lab_nomor')
-            ->whereIn('transaksi_details.lab_nomor', $labNomor)
-            ->get();
-
-        $data->each(function ($item) use ($detail) {
-            $item->detail = $detail->where('lab_nomor', $item->lab_nomor);
-        });
-
-        $hasil = LabHasil::where('lab_nomor', $labNomor)->get();
-
-        $data->each(function ($item) use ($hasil) {
-            $item->hasil = $hasil->where('lab_nomor', $item->lab_nomor);
-        });
-        return view('laboratorium.hasillab.index', compact('data'));
+        return view('laboratorium.hasillab.index');
     }
 
     public function getData(Request $request)
     {
         $data = Transaksi::query()
             ->join('perusahaans', 'perusahaans.prsh_kode', 'transaksis.prsh_kode')
-            ->orderBy('transaksi_id', "DESC")
+            ->orderBy('transaksis.transaksi_id', "desc")
             ->where('transaksis.lab_byr_jenis', 1);
 
         if (!empty($request->NomorRM)) {
@@ -74,8 +52,12 @@ class InputHasilLabController extends Controller
             $data = $data->where('transaksis.pasien_nama', 'ilike', '%' . $request->nama . '%');
         }
 
-        if (!empty($request->start) && !empty($request->end)) {
-            $data = $data->whereBetween('transaksis.lab_tanggal', [$request->start, $request->end]);
+        if (!empty($request->bulan)) {
+            $data = $data->whereMonth('transaksis.created_at', $request->bulan);
+        }
+
+        if (!empty($request->tahun)) {
+            $data = $data->whereYear('transaksis.created_at', $request->tahun);
         }
 
         $data = $data->get();
@@ -91,7 +73,62 @@ class InputHasilLabController extends Controller
             $item->detail = $detail->where('lab_nomor', $item->lab_nomor);
         });
 
-        return response()->json($data);
+        $hasil = LabHasil::whereIn('lab_nomor', $labNomor)->get();
+
+        $data->each(function ($item) use ($hasil) {
+            $item->hasil = $hasil->where('lab_nomor', $item->lab_nomor);
+        });
+
+
+        return datatables()
+            ->of($data)
+            ->addIndexColumn()
+            ->addColumn('aksi', function ($data) {
+                if ($data->hasil->count() == 0) {
+                    return '<div class="d-flex justify-content-center"> <a type="button" href="/laboratorium/inputhasillab/add/' . $data->transaksi_id . '" class="btn rounded btn-xs btn-info"><span class="tf-icons bx bxs-pencil mb-1"></span></a></div>';
+                } else {
+                    return '<div class="btn-group">
+                    <a type="button" target="_blank"
+                       href="/laboratorium/inputhasillab/printhasilperiksa/' . $data->lab_nomor . '"
+                       class="btn btn-outline-warning btn-sm">
+                        <span class="tf-icons bx bx-printer"></span>
+                    </a>
+                    <a type="button" href="/laboratorium/inputhasillab/sendhasilperiksa/' . $data->lab_nomor . '"
+                       class="btn btn-outline-danger btn-sm">
+                        <span class="tf-icons bx bx-mail-send"></span>
+                        </a>
+                    </div>';
+                }
+            })
+            ->addColumn('lab_tanggal', function ($data) {
+                return date('d-m-Y', strtotime($data->lab_tanggal));
+            })
+            ->addColumn('item_periksa', function ($data) {
+                $detailList = '';
+                foreach ($data->detail as $details) {
+                    $detailList .= '<li>' . $details->lab_nama . '</li>';
+                }
+
+                return '<a class="btn btn-primary btn-sm me-1 collapsed" data-bs-toggle="collapse"
+                    href="#item' . $data->transaksi_id . '" role="button" aria-expanded="false"
+                    aria-controls="collapseExample">
+                    Item Pemeriksaan
+                    </a>
+                    <div class="collapse" id="item' . $data->transaksi_id . '">
+                        <div class="d-grid d-sm-flex mt-1">
+                            <ol>' . $detailList . '</ol>
+                        </div>
+                    </div>';
+            })
+            ->addColumn('layanan', function ($data) {
+                $layanan = 'Home Service';
+                if ($data->jenis_layanan == '0') {
+                    $layanan = 'Datang ke Hi-LAB';
+                }
+                return $layanan;
+            })
+            ->rawColumns(['aksi', 'lab_tanggal', 'item_periksa', 'layanan'])
+            ->make(true);
     }
 
     public function create($id)

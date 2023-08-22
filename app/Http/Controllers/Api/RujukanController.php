@@ -74,25 +74,22 @@ class RujukanController extends Controller
 
             $current_date = date('Y-m-d H:i:s');
 
-            $file  = $request->pasien_nomor_rm . '-' . time() .  '.' . $request->file_rujukan->extension();
-            $path       = $request->file('file_rujukan')->move('storage/rujukan', $file);
+            $imageName = '/rujukan/' . $request->pasien_nomor_rm . '-' . time() . 'rujukan' . '.' . $request->file_rujukan->extension();
+            $path = $request->file('file_rujukan')->move('rujukan/', $imageName);
 
-
-            $user  = UserMobile::where('id', $request->user_mobile_id)->first();
+            $user = UserMobile::where('id', $request->user_mobile_id)->first();
             $rujukan = Rujukan::create([
                 'pasien_nomor_rm' => $request->pasien_nomor_rm,
                 'user_mobile_id' => $request->user_mobile_id,
                 'rujukan_no' => $this->createNewRujNumber(),
                 'nama_pasien' => $request->nama_pasien,
-                'file_rujukan' => 'https://staging-lis.k24.co.id/storage/rujukan/' . $file,
+                'file_rujukan' => $imageName,
                 'nama_dokter' => $request->nama_dokter,
                 'rumah_sakit' => $request->rumah_sakit,
                 'tanggal_transaksi' => $current_date,
                 'status' => 1,
                 'create_date' => $current_date,
                 'create_by' => $user->nama_lengkap,
-                'update_date' => $current_date,
-                'update_by' => $user->nama_lengkap
             ]);
         } catch (\Exception $e) {
             dd($e);

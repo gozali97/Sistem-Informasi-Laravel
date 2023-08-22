@@ -14,6 +14,7 @@ class CreatePasiensTable extends Migration
     public function up()
     {
         Schema::create('pasiens', function (Blueprint $table) {
+            $table->id();
             $table->string('pasien_nomor_rm', 13);
             $table->integer('user_mobile_id')->nullable();
             $table->string('pasien_nama');

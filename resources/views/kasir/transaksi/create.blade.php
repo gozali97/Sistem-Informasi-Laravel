@@ -262,11 +262,11 @@
 
         function calculateBayarSendiri() {
             const discPercentage = parseFloat($('#disc').val());
-            const bayarSendiri = parseFloat($('#bayarsendiri').val());
+            const harga_periksa = parseFloat($('#harga_pemeriksaan').val());
 
-            if (!isNaN(discPercentage) && !isNaN(bayarSendiri)) {
-                const discRp = (discPercentage / 100) * bayarSendiri;
-                const bayarAkhir = bayarSendiri - discRp;
+            if (!isNaN(discPercentage) && !isNaN(harga_periksa)) {
+                const discRp = (discPercentage / 100) * harga_periksa;
+                const bayarAkhir = harga_periksa - discRp;
 
                 $('#disc_rp').val(discRp.toFixed(2));
                 $('#bayarsendiri').val(bayarAkhir.toFixed(2));
@@ -372,6 +372,7 @@
                                 tarif.tarif_kode + '"></td>' +
                                 '<td>' + tarif.tarif_kode + '</td>' +
                                 '<td>' + tarif.tarif_nama + '</td>' +
+                                '<td>' + tarif.tarif_jalan + '</td>' +
                                 '</tr>';
                             $('#tableTarif').append(row);
                         });
@@ -397,10 +398,16 @@
                     $('#kode_tarif').val(selectedTarif.tarif_kode);
                     $('#nama_pemeriksaan').val(selectedTarif.tarif_nama);
                     $('#harga_pemeriksaan').val(selectedTarif.tarif_jalan);
-                    $('#bayarsendiri').val(selectedTarif.tarif_jalan);
                     $('#disc').val(selectedTarif.promo_percent);
                     $('#disc_rp').val(selectedTarif.promo_value);
-                    $('#asuransi').val(selectedTarif.tarif_jalan);
+
+                    if (selectedTarif.fix_value == 0.00) {
+                        $('#bayarsendiri').val(selectedTarif.tarif_jalan);
+                        $('#asuransi').val(selectedTarif.tarif_jalan);
+                    } else {
+                        $('#bayarsendiri').val(selectedTarif.fix_value);
+                        $('#asuransi').val(selectedTarif.fix_value);
+                    }
 
                     // document.getElementById("edit-pasien-button").disabled = false;
                     $('#pasienSingle').modal('hide');
@@ -433,6 +440,7 @@
                             var row = '<tr>' +
                                 '<td><input type="radio" name="pasien_radio" value="' +
                                 paket.paket_kode + '"></td>' +
+                                '<td>' + paket.paket_kode + '</td>' +
                                 '<td>' + paket.paket_nama + '</td>' +
                                 '<td>' + paket.paket_jalan + '</td>' +
                                 '</tr>';
@@ -553,7 +561,7 @@
                 });
 
                 updateTotalTarif();
-                $('#layananTable').DataTable()
+                // $('#layananTable').DataTable()
             });
 
             function formatRupiah(number) {

@@ -22,7 +22,7 @@ class NavigationController extends Controller
 
     public function index(Request $request)
     {
-        $data = Navigation::all();
+        $data = Navigation::query()->select('navigations.*')->orderBy('id', 'desc')->get();
 
         // $menu = Navigation::query()
         //     ->orWhereNull('main_menu')

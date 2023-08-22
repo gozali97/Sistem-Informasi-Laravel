@@ -34,9 +34,9 @@ class KasirLabController extends Controller
         $data = Transaksi::query()
             ->join('pasiens', 'pasiens.pasien_nomor_rm', 'transaksis.pasien_nomor_rm')
             ->leftJoin('kasir_jalans', 'kasir_jalans.kasir_no_trans', 'transaksis.lab_nomor')
-            ->select('transaksis.*', 'kasir_jalans.kasir_nomor', 'kasir_jalans.trans_tanggal', 'pasiens.pasien_nama')
+            ->select('transaksis.transaksi_id', 'transaksis.lab_nomor', 'transaksis.pasien_nomor_rm', 'transaksis.lab_no_reg', 'transaksis.jenis_layanan', 'kasir_jalans.kasir_nomor', 'kasir_jalans.kasir_tanggal', 'pasiens.pasien_nama')
             ->get();
-
+//        dd($data);
         return view('kasir.pembayaran.index', compact('data'));
     }
 
@@ -52,9 +52,9 @@ class KasirLabController extends Controller
             $newNumber = '0001';
         } else {
             $lastLabNumber = $lastTransaksi->kasir_nomor;
-            $lastYear = substr($lastLabNumber, 3, 2);
-            $lastMonth = substr($lastLabNumber, 5, 2);
-            $lastDay = substr($lastLabNumber, 7, 2);
+            $lastYear = substr($lastLabNumber, 4, 2);
+            $lastMonth = substr($lastLabNumber, 6, 2);
+            $lastDay = substr($lastLabNumber, 8, 2);
             $lastNumber = (int)substr($lastLabNumber, -4);
 
             if ($lastYear != $year || $lastMonth != $month || $lastDay != $day) {
@@ -82,7 +82,7 @@ class KasirLabController extends Controller
         $detail = TransaksiDetail::query()
             ->where('transaksi_details.lab_nomor', $data->lab_nomor)
             ->get();
-
+//        dd($detail);
         return view('kasir.pembayaran.pay', compact('data', 'autoNumbers', 'detail'));
     }
 
@@ -127,7 +127,7 @@ class KasirLabController extends Controller
             $data->kasir_asuransi = $request->asuransi;
             $data->kasir_jumlah = $request->totbayar;
             $data->kasir_tunai = $request->tunai;
-            $data->kasir_kartu = $request->kodekartu;
+            $data->kasir_kartu_kode = $request->kodekartu;
             $data->kasir_pribadi = $request->piutangpribadi;
             $data->kasir_keterangan = 'Laboraturium a/n ' . $request->nama;
             $data->prsh_kode = $request->prshkode;

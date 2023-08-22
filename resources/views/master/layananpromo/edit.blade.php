@@ -105,7 +105,7 @@
                                     class="text-danger">*</sup></label>
                             <input type="text" id="vpromo"
                                    value="{{ number_format($data->promo_value, 0, ',', '.') }}" name="tarif_promo"
-                                   class="form-control" placeholder="Harga Promo" required>
+                                   class="form-control" placeholder="Harga Promo" readonly>
                         </div>
                         <div class="mt-2">
                             <label for="persen_promo" class="form-label">Besar Promo %<sup
@@ -118,7 +118,7 @@
                                     class="text-danger">*</sup></label>
                             <input type="text" id="hargapromo"
                                    value="{{ number_format($data->fix_value, 0, ',', '.') }}" name="harga_akhir"
-                                   class="form-control" placeholder="Harga Akhir" required>
+                                   class="form-control" placeholder="Harga Akhir" readonly>
                         </div>
                     </div>
 

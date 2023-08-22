@@ -66,14 +66,11 @@
                                 }
                             @endphp
                             <td>{{ $layanan }}</td>
-                            @php
-                                $status = "Belum Diperiksa";
-                            @endphp
                             <td>
-                                @if($d->lab_ambil_status != 0)
-                                    <span class="badge bg-primary">Proses</span>
+                                @if($d->lab_byr_ket == 'Lunas')
+                                    <span class="badge bg-primary">Selesai</span>
                                 @else
-                                    <span class="badge bg-warning">Belum Diperiksa</span>
+                                    <span class="badge bg-warning">Prosess</span>
                                 @endif
                             </td>
                             <td>

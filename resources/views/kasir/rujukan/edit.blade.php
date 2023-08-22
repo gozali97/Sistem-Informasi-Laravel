@@ -57,13 +57,6 @@
 
             @csrf
             <div class="card-body">
-                {{--                <div>--}}
-                {{--                    <button type="button" class="btn rounded-pill btn-success" data-bs-toggle="modal"--}}
-                {{--                            data-bs-target="#pasienModal">--}}
-                {{--                        <span class="tf-icons bx bx-user-circle"></span>--}}
-                {{--                        Cari Pasien--}}
-                {{--                    </button>--}}
-                {{--                </div>--}}
                 <div class="row">
                     <input type="hidden" name="labnoreg" id="labnoreg">
                     <input type="hidden" name="jenispasienbarulama" id="jenispasienbarulama">

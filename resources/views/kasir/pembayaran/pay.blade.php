@@ -104,8 +104,19 @@
                                             <td>{{ $d->lab_nama }}</td>
                                             <td>{{ $d->lab_banyak }}</td>
                                             <td>RP. {{ number_format($d->lab_tarif, 0, ',', '.') }}</td>
-                                            <td>RP. {{ number_format($d->lab_diskon, 0, ',', '.') }}</td>
-                                            <td>RP. {{ number_format($d->lab_pribadi, 0, ',', '.') }}</td>
+                                            <td>
+                                                @if($d->lab_diskon == 'NaN')
+                                                    RP. 0
+                                                @else
+                                                    RP. {{ number_format( $d->lab_diskon, 0, ',', '.') }}</td>
+                                            @endif
+
+                                            <td>
+                                                @if($d->lab_pribadi == 'NaN')
+                                                    RP. 0
+                                                @else
+                                                    RP. {{ number_format($d->lab_pribadi, 0, ',', '.') }}</td>
+                                            @endif
                                         </tr>
                                     @endforeach
                                     </tbody>
@@ -167,8 +178,8 @@
                         <div class="row mt-2">
                             <div class="col-md-6">
                                 <label class="form-label">Tunai</label>
-                                <input type="number" name="tunai" id="tunai" value="0" class="form-control"
-                                       onchange="calculateChange()"/>
+                                <input type="number" name="tunai" id="tunai" placeholder="0" class="form-control"
+                                       onchange="calculateChange()" required/>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Kembali</label>

@@ -101,7 +101,7 @@
                             <label for="tarif_promo" class="form-label">Harga Promo<sup
                                     class="text-danger">*</sup></label>
                             <input type="text" id="vpromo" value="{{ old('tarif_promo') }}" name="tarif_promo"
-                                   class="form-control" placeholder="Harga Promo" required>
+                                   class="form-control" placeholder="Harga Promo" readonly>
                         </div>
                         <div class="mt-2">
                             <label for="persen_promo" class="form-label">Besar Promo %<sup
@@ -113,7 +113,7 @@
                             <label for="harga_akhir" class="form-label">Harga Akhir<sup
                                     class="text-danger">*</sup></label>
                             <input type="text" id="hargapromo" value="{{ old('harga_akhir') }}" name="harga_akhir"
-                                   class="form-control" placeholder="Harga Akhir" required>
+                                   class="form-control" placeholder="Harga Akhir" readonly>
                         </div>
                     </div>
 

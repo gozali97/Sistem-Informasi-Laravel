@@ -24,6 +24,7 @@
                 <table class="table table-striped" id="table1">
                     <thead>
                     <tr>
+                        <th>#</th>
                         <th>No Transaksi</th>
                         <th>No Registrasi</th>
                         <th>Jenis Layanan</th>
@@ -31,12 +32,25 @@
                         <th>Nama</th>
                         <th>No Kwitansi</th>
                         <th>Tanggal Bayar</th>
-                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach ($data as $d)
                         <tr>
+                            <td>
+                                @if($d->kasir_nomor)
+                                    <a type="button" target="_blank"
+                                       href="{{ route('pembayaran.print', $d->lab_nomor) }}"
+                                       class="btn btn-secondary">
+                                        <span class="tf-icons bx bx-printer mb-1"></span>&nbsp
+                                    </a>
+                                @else
+                                    <a type="button" href="{{ route('pembayaran.pay', $d->transaksi_id) }}"
+                                       class="btn rounded-pill btn-success">
+                                        <span class="tf-icons bx bx-cart mb-1"></span>&nbsp; Bayar
+                                    </a>
+                                @endif
+                            </td>
                             <td>{{ $d->lab_nomor }}</td>
                             <td>{{ $d->lab_no_reg }}</td>
                             @php
@@ -50,19 +64,9 @@
                             <td>{{ $d->pasien_nomor_rm}}</td>
                             <td>{{ $d->pasien_nama}}</td>
                             <td>{{ $d->kasir_nomor}}</td>
-                            <td>{{ \Carbon\Carbon::parse($d->trans_tanggal)->format('d-m-Y') }}</td>
                             <td>
-                                @if($d->kasir_nomor)
-                                    <a type="button" target="_blank"
-                                       href="{{ route('pembayaran.print', $d->lab_nomor) }}"
-                                       class="btn btn-secondary">
-                                        <span class="tf-icons bx bx-printer mb-1"></span>&nbsp
-                                    </a>
-                                @else
-                                    <a type="button" href="{{ route('pembayaran.pay', $d->transaksi_id) }}"
-                                       class="btn rounded-pill btn-success">
-                                        <span class="tf-icons bx bx-cart mb-1"></span>&nbsp; Bayar
-                                    </a>
+                                @if($d->kasir_tanggal)
+                                    {{ \Carbon\Carbon::parse($d->kasir_tanggal)->format('d-m-Y') }}
                                 @endif
                             </td>
                         </tr>

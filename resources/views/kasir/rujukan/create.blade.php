@@ -27,16 +27,29 @@
         .hide {
             display: none;
         }
+
+        .zoom {
+            transition: transform .2s;
+            width: 480px;
+            height: 250px;
+            margin: 0 auto;
+        }
+
+        .zoom:hover {
+            -ms-transform: scale(1.5); /* IE 9 */
+            -webkit-transform: scale(1.5); /* Safari 3-8 */
+            transform: scale(1.5);
+        }
     </style>
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Master /</span> Input Rujukan Laboratorium</h4>
 
     <!-- Basic Bootstrap Table -->
-    <form id="form-id" action="{{ route('transaksi.store') }}" method="POST" enctype="multipart/form-data">
+    <form id="form-id" action="{{ route('rujukan.store') }}" method="POST" enctype="multipart/form-data">
 
         <div class="card">
             <div class="card-header">
 
-                <a href="{{ route('transaksi.index') }}" type="button" class="btn btn-outline-secondary mt-3">
+                <a href="{{ route('rujukan.index') }}" type="button" class="btn btn-outline-secondary mt-3">
                     Kembali
                 </a>
             </div>
@@ -78,56 +91,31 @@
                             <label class="form-label">Tanggal Lahir</label>
                             <input type="date" name="tgllahir" id="tgllahir" class="form-control" readonly>
                         </div>
-
-
                         <div class="mt-2">
                             <label class="form-label">Alamat</label>
                             <textarea name="alamat" id="alamat" class="form-control" rows="3" readonly></textarea>
                         </div>
+
                     </div>
                     <div class="col-md-6 mb-3">
                         <div class="mt-2">
-                            <label class="form-label">Jenis Kelamin</label>
-                            <input type="text" id="nama_jk" class="form-control" readonly>
-                        </div>
-
-                        <div class="mt-2">
-                            <label class="form-label">Umur</label>
-                            <input type="hidden" id="umur" value="">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <input type="text" name="pasienumurthn" id="pasienumurthn" class="form-control"
-                                           placeholder="0" readonly> Tahun
-                                </div>
-                                <div class="col-md-4">
-                                    <input type="text" name="pasienumurbln" id="pasienumurbln" class="form-control"
-                                           placeholder="0" readonly> Bulan
-                                </div>
-                                <div class="col-md-4">
-                                    <input type="text" name="pasienumurhari" id="pasienumurhari" class="form-control"
-                                           placeholder="0" readonly> Hari
-                                </div>
-                            </div>
+                            <label class="form-label">Nama Dokter<sup class="text-danger">*</sup></label>
+                            <input type="text" name="nama_dokter" id="nama_dokter" class="form-control" required/>
                         </div>
                         <div class="mt-2">
-                            <label class="form-label">Penjamin</label>
-                            <input type="text" id="penjamin" name="penjamin" class="form-control" readonly>
+                            <label class="form-label">Rumah Sakit<sup class="text-danger">*</sup></label>
+                            <input type="text" name="rumah_sakit" id="rumah_sakit" class="form-control" required/>
                         </div>
-
                         <div class="mt-2">
-                            <label class="form-label">Jenis Layanan<sup class="text-danger">*</sup></label>
-                            <select name="jenis_layanan" id="jenis_layanan" class="form-control" required>
-                                <option value="">-- Pilih--</option>
-                                <option value="0">Datang ke Hi-Lab</option>
-                                <option value="1">Home Service</option>
-                            </select>
+                            <label for="formFile" class="form-label">Upload FIle Rujukan<sup class="text-danger">*</sup></label>
+                            <input type="file" id="formFile" name="file_rujukan" class="form-control"
+                                   accept="image/png, image/jpeg" required>
                         </div>
-
-                        <div class="mt-2">
-                            <label class="form-label">Jam Periksa<sup class="text-danger">*</sup></label>
-                            <input type="time" name="jamperiksa" id="jamperiksa" class="form-control" required/>
+                        <div class="mt-3">
+                            <img src="https://fakeimg.pl/350x200/45CFDD/FFF/?text=FIle%20Rujukan" alt="user-avatar"
+                                 class="d-block rounded zoom"
+                                 height="250" width="480" id="preview">
                         </div>
-
                     </div>
 
                 </div>
@@ -240,9 +228,9 @@
             <button type="submit" class="btn btn-primary">Save changes</button>
         </div>
     </form>
-    @include('kasir.transaksi.modalPasienLama')
-    @include('kasir.transaksi.modalSingle')
-    @include('kasir.transaksi.modalPaket')
+    @include('kasir.rujukan.modalPasienLama')
+    @include('kasir.rujukan.modalSingle')
+    @include('kasir.rujukan.modalPaket')
 
     <script>
         @if (session('toast_success'))
@@ -261,7 +249,7 @@
 
         function calculateBayarSendiri() {
             const discPercentage = parseFloat($('#disc').val());
-            const bayarSendiri = parseFloat($('#bayarsendiri').val());
+            const bayarSendiri = parseFloat($('#harga_pemeriksaan').val());
 
             if (!isNaN(discPercentage) && !isNaN(bayarSendiri)) {
                 const discRp = (discPercentage / 100) * bayarSendiri;
@@ -272,8 +260,25 @@
                 $('#asuransi').val(bayarAkhir.toFixed(2));
             }
         }
-    </script>
 
+        document.getElementById("formFile").addEventListener("change", function (event) {
+            let file = event.target.files[0];
+
+            // Membuat objek FileReader
+            let reader = new FileReader();
+
+            // Membuat event listener untuk ketika file selesai dibaca
+            reader.addEventListener("load", function () {
+                // Mengganti sumber gambar pada elemen img dengan gambar yang sudah dipilih
+                document.getElementById("preview").src = reader.result;
+            }, false);
+
+            // Membaca file yang dipilih sebagai data URL
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 
     <script>
         $(document).ready(function () {
@@ -283,7 +288,7 @@
                 $('#tablepasien').empty();
 
                 $.ajax({
-                    url: "/kasir/transaksi/getRawatJalan",
+                    url: "/kasir/rujukan/getPasien",
                     type: "GET",
                     success: function (result) {
 
@@ -324,11 +329,10 @@
                     $('#pasiennorm').val(selectedPasien.pasien_nomor_rm);
                     $('#tgllahir').val(selectedPasien.pasien_tgl_lahir);
                     $('#nama').val(selectedPasien.pasien_nama);
-                    $('#nama_jk').val(selectedPasien.gender);
+                    $('#nama_jk').val(selectedPasien.pasien_gender);
                     $('#alamat').val(selectedPasien.pasien_alamat);
                     $('#telepon').val(selectedPasien.pasien_telp);
                     $('#nama_jenispas').val(selectedPasien.jenis);
-                    $('#penjamin').val(selectedPasien.prsh_nama);
 
                     $('#pasienumurthn').val(selectedPasien.pasien_umur_thn)
                     $('#pasienumurbln').val(selectedPasien.pasien_umur_bln)
@@ -348,6 +352,30 @@
                 }
             });
 
+            function submitForm() {
+                var pasien = document.getElementById('pasien_rm');
+                if (pasien.value == '') {
+                    // Jika jumlah angka di input KTP kurang dari 16, tampilkan SweetAlert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data pasien kosong',
+                        text: 'Anda harus memilih pasien dulu!',
+                        confirmButtonText: 'OK'
+                    });
+                    return false; // Jangan submit form
+                }
+                return true; // Submit form jika valid
+            }
+
+            // Event listener untuk memanggil fungsi submitForm saat form disubmit
+            var form = document.getElementById('form-id');
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); // Mencegah submit otomatis
+                if (submitForm()) {
+                    form.submit(); // Submit form jika valid
+                }
+            });
+
         });
     </script>
 
@@ -359,7 +387,7 @@
                 $('#tableTarif').empty();
 
                 $.ajax({
-                    url: "/kasir/transaksi/getPemeriksaan",
+                    url: "/kasir/rujukan/getPemeriksaan",
                     type: "GET",
                     success: function (result) {
 
@@ -370,6 +398,7 @@
                                 tarif.tarif_kode + '"></td>' +
                                 '<td>' + tarif.tarif_kode + '</td>' +
                                 '<td>' + tarif.tarif_nama + '</td>' +
+                                '<td>' + tarif.tarif_jalan + '</td>' +
                                 '</tr>';
                             $('#tableTarif').append(row);
                         });
@@ -395,10 +424,17 @@
                     $('#kode_tarif').val(selectedTarif.tarif_kode);
                     $('#nama_pemeriksaan').val(selectedTarif.tarif_nama);
                     $('#harga_pemeriksaan').val(selectedTarif.tarif_jalan);
-                    $('#bayarsendiri').val(selectedTarif.tarif_jalan);
                     $('#disc').val(selectedTarif.promo_percent);
                     $('#disc_rp').val(selectedTarif.promo_value);
-                    $('#asuransi').val(selectedTarif.tarif_jalan);
+
+                    if (selectedTarif.fix_value == 0.00) {
+                        $('#bayarsendiri').val(selectedTarif.tarif_jalan);
+                        $('#asuransi').val(selectedTarif.tarif_jalan);
+                    } else {
+                        $('#bayarsendiri').val(selectedTarif.fix_value);
+                        $('#asuransi').val(selectedTarif.fix_value);
+                    }
+
 
                     // document.getElementById("edit-pasien-button").disabled = false;
                     $('#pasienSingle').modal('hide');
@@ -422,7 +458,7 @@
                 $('#tablePaket').empty();
 
                 $.ajax({
-                    url: "/kasir/transaksi/getPaket",
+                    url: "/kasir/rujukan/getPaket",
                     type: "GET",
                     success: function (result) {
 
@@ -431,6 +467,7 @@
                             var row = '<tr>' +
                                 '<td><input type="radio" name="pasien_radio" value="' +
                                 paket.paket_kode + '"></td>' +
+                                '<td>' + paket.paket_kode + '</td>' +
                                 '<td>' + paket.paket_nama + '</td>' +
                                 '<td>' + paket.paket_jalan + '</td>' +
                                 '</tr>';
@@ -544,14 +581,14 @@
                                         <td><input type="hidden" value="${row.discRp}" name="discRp[]">${row.discRp}</td>
                                         <td><input type="hidden" value="${row.asuransi}" name="asuransi[]">${row.asuransi}</td>
                                         <td><input type="hidden" value="${row.bayarSendiri}" name="bayarSendiri[]">${row.bayarSendiri}</td>
-                                        <td><button type="button" id="removeLayanan" class="btn btn-danger btn-sm removeLayanan">Remove</button></td>
+                                        <td><button type="button" id="removeLayanan" class="btn btn-danger btn-sm removeLayanan"><span class="tf-icons bx bx-trash"></span></button></td>
                                     </tr>
                                 `;
                     $('#addlayanan').append(newRow);
                 });
 
                 updateTotalTarif();
-                $('#layananTable').DataTable()
+                // $('#layananTable').DataTable()
             });
 
             function formatRupiah(number) {
@@ -594,23 +631,5 @@
                 });
             });
         });
-    </script>
-    <script>
-        function confirmDelete(id) {
-            Swal.fire({
-                title: "Apakah Anda yakin?",
-                text: "Data yang dihapus tidak bisa dikembalikan!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Ya, hapus!",
-                cancelButtonText: "Batal",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "/account/user/destroy/" + id;
-                }
-            });
-        }
     </script>
 </x-app-layout>

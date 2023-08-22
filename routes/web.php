@@ -5,7 +5,6 @@ use App\Http\Controllers\Account\MasterUserMobileController;
 use App\Http\Controllers\Kasir\TransaksiLabController;
 use App\Http\Controllers\Kasir\RujukanLabController;
 use App\Http\Controllers\Kasir\KasirLabController;
-use App\Http\Controllers\Pendaftaran\PendaftaranPasienController;
 use App\Http\Controllers\Konfigurasi\RoleController;
 use App\Http\Controllers\Konfigurasi\NavigationController;
 use App\Http\Controllers\Konfigurasi\PermissionController;
@@ -33,9 +32,11 @@ use App\Http\Controllers\Master\MasterSyaratKetentuanController;
 use App\Http\Controllers\Master\MasterTarifLabController;
 use App\Http\Controllers\Master\MasterTentangKamiController;
 use App\Http\Controllers\Master\MasterTtdDokterController;
+use App\Http\Controllers\Master\DokterHilabController;
 use App\Http\Controllers\Pendaftaran\AppointmentController;
 use App\Http\Controllers\Pendaftaran\InformasiPendaftaranController;
 use App\Http\Controllers\Pendaftaran\PendaftaranLabController;
+use App\Http\Controllers\Pendaftaran\PendaftaranPasienController;
 use App\Http\Controllers\TabelData\TabelTarifLabController;
 use App\Http\Controllers\TabelData\TabelPemeriksaanController;
 use App\Http\Controllers\TabelData\TabelHubTarifPemeriksaanController;
@@ -101,6 +102,7 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::controller(PendaftaranPasienController::class)->group(function () {
         Route::get('pendaftaran/pasien', 'index')->name('pendaftaran.pasien.index');
+        Route::get('pendaftaran/pasien/create', 'create')->name('pendaftaran.pasien.create');
         Route::get('pendaftaran/pasien/add', 'create')->name('pendaftaran.pasien.add');
         Route::post('pendaftaran/pasien/store', 'store')->name('pendaftaran.pasien.store');
         Route::get('pendaftaran/pasien/edit/{id}', 'edit')->name('pendaftaran.pasien.edit');
@@ -162,9 +164,9 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::post('/kasir/rujukan/update/{id}', 'update')->name('rujukan.update');
         Route::get('/kasir/rujukan/destroy/{id}', 'destroy')->name('rujukan.destroy');
 
-        Route::get('/kasir/rujukan/getRawatJalan', 'getRawatJalan')->name('lab.getRawatJalan');
-        Route::get('/kasir/rujukan/getPemeriksaan', 'getPemeriksaan')->name('lab.getPemeriksaan');
-        Route::get('/kasir/rujukan/getPaket', 'getPaket')->name('lab.getPaket');
+        Route::get('/kasir/rujukan/getPasien', 'getPasien')->name('rujukan.getPasien');
+        Route::get('/kasir/rujukan/getPemeriksaan', 'getPemeriksaan')->name('rujukan.getPemeriksaan');
+        Route::get('/kasir/rujukan/getPaket', 'getPaket')->name('rujukan.getPaket');
     });
 
     Route::controller(KasirLabController::class)->group(function () {
@@ -256,6 +258,15 @@ Route::middleware('auth', 'verified')->group(function () {
     });
 
     //master
+    Route::controller(DokterHilabController::class)->group(function () {
+        Route::get('/master/dokterhilab', 'index')->name('dokterhilab.index');
+        Route::get('/master/dokterhilab/add', 'create')->name('dokterhilab.add');
+        Route::post('/master/dokterhilab/store', 'store')->name('dokterhilab.store');
+        Route::get('/master/dokterhilab/edit/{id}', 'edit')->name('dokterhilab.edit');
+        Route::post('/master/dokterhilab/update/{id}', 'update')->name('dokterhilab.update');
+        Route::get('/master/dokterhilab/destroy/{id}', 'destroy')->name('dokterhilab.destroy');
+    });
+
     Route::controller(MasterPaketLabController::class)->group(function () {
         Route::get('/master/paketlab', 'index')->name('paketlab.index');
         Route::get('/master/paketlab/add', 'create')->name('paketlab.add');
@@ -283,7 +294,6 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::get('/master/tariflab/destroy/{id}', 'destroy')->name('tariflab.destroy');
 
         Route::get('/master/tariflab/getData', 'getData')->name('tariflab.getData');
-
     });
 
     Route::controller(MasterHubTarifPemeriksaanController::class)->group(function () {
@@ -296,10 +306,9 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::get('/master/hubtarifpemeriksaan/destroy/{id}', 'destroy')->name('hubtarifpemeriksaan.destroy');
 
         Route::get('/master/hubtarifpemeriksaan/getData', 'getData')->name('hubtarifpemeriksaan.getData');
-
     });
 
-//    Route::resource('/master/hubtarifpaket', MasterHubTarifPaketController::class);
+    //    Route::resource('/master/hubtarifpaket', MasterHubTarifPaketController::class);
     Route::controller(MasterHubTarifPaketController::class)->group(function () {
         Route::get('/master/hubtarifpaket', 'index')->name('hubtarifpaket.index');
         Route::get('/master/hubtarifpaket/add', 'create')->name('hubtarifpaket.add');
@@ -310,7 +319,6 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::get('/master/hubtarifpaket/destroy/{id}', 'destroy')->name('hubtarifpaket.destroy');
 
         Route::get('/master/hubtarifpaket/getData', 'getData')->name('hubtarifpaket.getData');
-
     });
 
     Route::controller(MasterLabReferenceController::class)->group(function () {

@@ -21,33 +21,14 @@ class MasterTarifLabController extends Controller
         $this->middleware('can:read master/tariflab');
     }
 
-    public function index(Request $request)
+    public function index()
     {
-
-        $tarif = $request->tarif;
-        $paket = $request->paket;
-
-        $data = TarifLab::select('tarif_labs.*')
-            ->join('paket_hubungs', 'paket_hubungs.tarif_kode', 'tarif_labs.tarif_kode')
-            ->join('paket_labs', 'paket_labs.paket_kode', 'paket_hubungs.paket_kode')
-            ->orderby('id', 'ASC')
-            ->distinct();
-
-        if (!empty($tarif)) {
-            $data = $data->where('tarif_labs.tarif_kelompok', 'like', '%' . $tarif . '%');
-        }
-
-        if (!empty($paket)) {
-            $data = $data->where('paket_labs.paket_kode', 'like', '%' . $paket . '%');
-        }
-
-        $data = $data->get();
 
         $tarif = TarifVar::query()->where('var_seri', '=', 'LAB')->orderby('var_nama')->get();
 
         $paket = PaketLab::all();
 
-        return view('master.tariflab.index', compact('data', 'tarif', 'paket'));
+        return view('master.tariflab.index', compact('tarif', 'paket'));
     }
 
     public function create()
@@ -229,8 +210,8 @@ class MasterTarifLabController extends Controller
         $paket = $request->paket;
 
         $data = TarifLab::select('tarif_labs.*')
-            ->join('paket_hubungs', 'paket_hubungs.tarif_kode', 'tarif_labs.tarif_kode')
-            ->join('paket_labs', 'paket_labs.paket_kode', 'paket_hubungs.paket_kode')
+            ->leftJoin('paket_hubungs', 'paket_hubungs.tarif_kode', 'tarif_labs.tarif_kode')
+            ->leftJoin('paket_labs', 'paket_labs.paket_kode', 'paket_hubungs.paket_kode')
             ->orderby('id', 'ASC')
             ->distinct();
 
@@ -244,6 +225,37 @@ class MasterTarifLabController extends Controller
 
         $data = $data->get();
 
-        return response()->json($data);
+        return datatables()
+            ->of($data)
+            ->addIndexColumn()
+            ->addColumn('path_gambar', function ($data) {
+                if ($data->path_gambar) {
+                    return '<img src = "{{ url($d->path_gambar) }}" alt class="w-px-50 h-auto rounded" />';
+                } else {
+                    return '<img src = "https://fakeimg.pl/300x200/071952/FFF/?text=Sample&font=lobster" alt class="w-px-50 h-auto rounded" />';
+                }
+            })
+            ->addColumn('status', function ($data) {
+                $status = 'Tidak Aktif';
+
+                if ($data->tarif_status == 'A') {
+                    $status = 'Aktif';
+                }
+                return $status;
+            })
+            ->addColumn('aksi', function ($data) {
+                return '<div class="btn-group">
+                                    <a href="' . route('tariflab.edit', $data->id) . '" type="button"
+                                       class="btn btn-icon btn-outline-warning">
+                                        <span class="tf-icons bx bx-edit"></span>
+                                    </a>
+                                    <button type="button" class="btn btn-icon btn-outline-danger"
+                                            onclick="event.preventDefault(); confirmDelete(' . $data->id . ');">
+                                        <span class="tf-icons bx bx-trash"></span>
+                                    </button>
+                                </div>';
+            })
+            ->rawColumns(['path_gambar', 'aksi', 'status'])
+            ->make(true);
     }
 }

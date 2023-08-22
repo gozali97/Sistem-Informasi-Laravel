@@ -57,12 +57,33 @@
                             <div class="col-md-4 mb-3">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="form-label">Tanggal Mulai</label>
-                                        <input type="date" id="start" class="form-control" name="start">
+                                        <label class="form-label">Bulan</label>
+                                        <select id="bulan" class="form-control" name="bulan">
+                                            <option value="">-- Pilih Bulan --</option>
+                                            @for ($i = 1; $i <= 12; $i++)
+                                                @php
+                                                    $bulan = str_pad($i, 2, '0', STR_PAD_LEFT);
+                                                @endphp
+                                                <option value="{{ $bulan }}">
+                                                    {{ date('F', mktime(0, 0, 0, $i, 1)) }}
+                                                </option>
+                                            @endfor
+                                        </select>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Tanggal Akhir</label>
-                                        <input type="date" id="end" class="form-control" name="end">
+                                        <label class="form-label">Tahun</label>
+                                        <select id="tahun" class="form-control" name="tahun">
+                                            <option value="">-- Pilih Tahun --</option>
+                                            @php
+                                                $tahunSekarang = date('Y');
+                                                $tahunMulai = $tahunSekarang - 5;
+                                                $tahunAkhir = $tahunSekarang + 5;
+                                            @endphp
+                                            @for ($tahun = $tahunMulai; $tahun <= $tahunAkhir; $tahun++)
+                                                <option value="{{ $tahun }}">{{ $tahun }}
+                                                </option>
+                                            @endfor
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="mt-2">
@@ -84,6 +105,7 @@
                             <table class="table table-striped" id="table1">
                                 <thead>
                                     <tr>
+                                        <th>#</th>
                                         <th>Nomor RM</th>
                                         <th>NO KTP</th>
                                         <th>Nama Pasien</th>
@@ -97,46 +119,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tabelRegis">
-                                    @php
-                                        $no = 1;
-                                    @endphp
-                                    @foreach ($data as $d)
-                                        <tr>
-                                            <td>{{ $d->pasien_nomor_rm }}</td>
-                                            <td>{{ $d->pasien_no_id }}</td>
-                                            <td>{{ $d->pasien_nama }}</td>
-                                            @php
-                                                $gender = 'Laki-Laki';
-                                                if ($d->pasien_gender == 'P') {
-                                                    $gender = 'Perempuan';
-                                                }
-                                            @endphp
-                                            <td>{{ $gender }}</td>
-                                            <td>{{ $d->pasien_alamat }}</td>
-                                            @php
-                                                $tglLahir = new DateTime($d->pasien_tgl_lahir);
-                                                $tglSekarang = new DateTime();
-                                                $umurInterval = $tglLahir->diff($tglSekarang);
-                                                $umur = $umurInterval->y;
-                                            @endphp
-                                            <td>{{ $umur }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($d->jalan_tanggal)) }}</td>
-                                            <td>{{ $d->grup_nama }}</td>
-                                            <td>{{ $d->prsh_nama }}</td>
-                                            @php
-                                                $layanan = 'Home Service';
-                                                
-                                                if ($d->jenis_layanan == '0') {
-                                                    $layanan = 'Datang ke Hi-LAB';
-                                                }
-                                            @endphp
-                                            <td>{{ $layanan }}</td>
-                                        </tr>
 
-                                        @php
-                                            $no++;
-                                        @endphp
-                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -164,87 +147,66 @@
                 </script>
                 <script>
                     $(document).ready(function() {
-                        $('#table1').DataTable();
-                    });
-                </script>
+                        dataTable = $('.table').DataTable({
+                            processing: true,
+                            autoWidth: false,
+                            serverSide: true,
+                            ajax: {
+                                url: '{{ route('rekapkunjunganlab.getData') }}',
+                                data: function(d) {
+                                    console.log(d);
+                                    d.NomorRM = $('#NomorRM').val();
+                                    d.nama = $('#nama').val();
+                                    d.bulan = $('#bulan').val();
+                                    d.tahun = $('#tahun').val();
+                                    d.layanan = $('#layanan').val();
+                                    d.pengirim = $('#pengirim').val();
+                                    d.penjamin = $('#penjamin').val();
+                                }
+                            },
+                            columns: [{
+                                    data: 'DT_RowIndex',
+                                    searchable: false,
+                                    sortable: false
+                                },
+                                {
+                                    data: 'pasien_nomor_rm'
+                                },
+                                {
+                                    data: 'pasien_no_id'
+                                },
+                                {
+                                    data: 'pasien_nama'
+                                },
+                                {
+                                    data: 'pasien_gender'
+                                },
+                                {
+                                    data: 'pasien_alamat'
+                                },
+                                {
+                                    data: 'pasien_tgl_lahir'
+                                },
+                                {
+                                    data: 'jalan_tanggal'
+                                },
+                                {
+                                    data: 'grup_nama'
+                                },
+                                {
+                                    data: 'prsh_nama'
+                                },
+                                {
+                                    data: 'layanan'
+                                },
 
-                <script>
-                    $(document).ready(function() {
-                        $('#NomorRM, #nama, #start, #end, #layanan, #pengirim, #penjamin').on('change', function() {
-                            fetchFilteredData();
+                            ]
                         });
 
-                        function fetchFilteredData() {
-                            Swal.fire({
-                                title: 'Loading...',
-                                showConfirmButton: false,
-                                allowOutsideClick: false,
-                                willOpen: () => {
-                                    Swal.showLoading();
-                                }
-                            });
+                        $('#NomorRM, #nama, #bulan, #tahun, #layanan, #pengirim, #penjamin').on('change', function() {
+                            dataTable.ajax.reload();
+                        });
 
-                            $.ajax({
-                                url: "{{ route('registrasilab.getData') }}",
-                                type: "GET",
-                                data: {
-                                    NomorRM: $('#NomorRM').val(),
-                                    nama: $('#nama').val(),
-                                    start: $('#start').val(),
-                                    end: $('#end').val(),
-                                    layanan: $('#layanan').val(),
-                                    pengirim: $('#pengirim').val(),
-                                    penjamin: $('#penjamin').val()
-                                },
-                                success: function(data) {
-                                    updateTable(data);
-                                    Swal.close();
-                                },
-                                error: function(error) {
-                                    console.error(error);
-                                    Swal.close();
-                                }
-                            });
-                        }
-
-                        function updateTable(data) {
-                            var tableBody = $('#tabelRegis');
-                            tableBody.empty();
-
-                            $.each(data, function(index, d) {
-                                var tglLahir = new Date(d.pasien_tgl_lahir);
-                                var tglSekarang = new Date();
-                                var umurInterval = tglSekarang.getFullYear() - tglLahir.getFullYear();
-                                var bulanSekarang = tglSekarang.getMonth();
-                                var bulanLahir = tglLahir.getMonth();
-
-                                if (bulanLahir > bulanSekarang || (bulanLahir === bulanSekarang && tglLahir.getDate() >
-                                        tglSekarang.getDate())) {
-                                    umurInterval--;
-                                }
-
-                                var gender = (d.pasien_gender === 'P') ? 'Perempuan' : 'Laki-Laki';
-                                var layanan = (d.jenis_layanan === 0) ? 'Datang ke Hi-LAB' : 'Home Service';
-
-                                var formattedTanggal = new Date(d.jalan_tanggal).toLocaleDateString('en-GB');
-
-                                var newRow = "<tr>" +
-                                    "<td>" + d.pasien_nomor_rm + "</td>" +
-                                    "<td>" + d.pasien_no_id + "</td>" +
-                                    "<td>" + d.pasien_nama + "</td>" +
-                                    "<td>" + gender + "</td>" +
-                                    "<td>" + d.pasien_alamat + "</td>" +
-                                    "<td>" + umurInterval + "</td>" +
-                                    "<td>" + formattedTanggal + "</td>" +
-                                    "<td>" + d.grup_nama + "</td>" +
-                                    "<td>" + d.prsh_nama + "</td>" +
-                                    "<td>" + layanan + "</td>" +
-
-                                    "</tr>";
-
-                                tableBody.append(newRow);
-                            });
-                        }
                     });
                 </script>
             </x-app-layout>

@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Pasien extends Model
 {
     use HasFactory;
-    protected $table    ='pasiens';
-    public $timestamps  =false;
-    public $incrementing = false;
-    protected  $primaryKey = 'pasien_nomor_rm';
+
+    protected $table = 'pasiens';
+    protected $primaryKey = 'id';
     protected $guarded = [];
 
-    public function users(){
+    public function users()
+    {
         return $this->hasOne(UserMobile::class, "id", "user_mobile_id");
     }
 

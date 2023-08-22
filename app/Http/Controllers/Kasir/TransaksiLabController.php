@@ -30,9 +30,9 @@ class TransaksiLabController extends Controller
         $this->middleware('can:read kasir/transaksi');
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $data = Transaksi::all();
+        $data = Transaksi::query()->select('transaksis.*')->orderBy('transaksi_id', 'asc')->get();
 
         $labNomor = $data->pluck('lab_nomor');
 
@@ -59,13 +59,13 @@ class TransaksiLabController extends Controller
         if ($lastTransaksi == null) {
             $newNumber = '0001';
         } else {
-            $lastLabNumber = $lastTransaksi->lab_no_reg;
-            $lastYear = substr($lastLabNumber, 3, 2);
-            $lastMonth = substr($lastLabNumber, 5, 2);
-            $lastDay = substr($lastLabNumber, 7, 2);
+            $lastLabNumber = $lastTransaksi->lab_nomor;
+            $lastYear = substr($lastLabNumber, 4, 2);
+            $lastMonth = substr($lastLabNumber, 6, 2);
+            $lastDay = substr($lastLabNumber, 8, 2);
             $lastNumber = (int)substr($lastLabNumber, -4);
 
-            if ($lastYear != $year || $lastMonth != $month || $lastDay != $day) {
+            if ($lastYear != $year && $lastMonth != $month && $lastDay != $day) {
                 $newNumber = '0001';
             } else {
                 $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
@@ -202,6 +202,11 @@ class TransaksiLabController extends Controller
                 }
 
                 TransaksiDetail::insert($labDetails);
+
+                $rawatjalan = RawatJalan::where('jalan_no_reg', '=', $request->labnoreg)->first();
+                $rawatjalan->jalan_status = 'R';
+                $rawatjalan->save();
+
                 DB::commit();
 
                 Session::flash('toast_success', 'Data berhasil ditambah');
@@ -265,11 +270,11 @@ class TransaksiLabController extends Controller
                 $join->on('jenis.var_kode', '=', 'pasiens.pasien_jenis')
                     ->where('jenis.var_seri', '=', 'JENISPAS');
             })
-            ->join('perusahaans', 'perusahaans.prsh_kode', 'rawat_jalans.prsh_kode')
+            ->leftJoin('perusahaans', 'perusahaans.prsh_kode', 'rawat_jalans.prsh_kode')
             ->join('user_mobiles', 'user_mobiles.id', 'pasiens.user_mobile_id')
             ->select('rawat_jalans.*', 'pasiens.pasien_tgl_lahir', 'gender.var_nama as gender', 'jenis.var_nama as jenis', 'perusahaans.prsh_nama')
             ->where('rawat_jalans.jalan_status', 'D')
-            ->orderBy('jalan_no_reg', 'ASC')
+            ->orderBy('jalan_no_reg', 'desc')
             ->get();
 
         return response()->json($data);
@@ -278,7 +283,8 @@ class TransaksiLabController extends Controller
     public function getPemeriksaan()
     {
         $data = TarifLab::query()
-            ->orderBy('tarif_kode', 'ASC')
+            ->where('tarif_status', 'A')
+            ->orderBy('id', 'desc')
             ->get();
 
         return response()->json($data);
@@ -288,7 +294,8 @@ class TransaksiLabController extends Controller
     {
 
         $data = PaketLab::query()
-            ->orderBy('paket_kode', 'ASC')
+            ->where('paket_status', 'A')
+            ->orderBy('paket_kode', 'desc')
             ->get();
 
         return response()->json($data);

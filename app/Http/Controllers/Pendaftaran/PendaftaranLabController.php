@@ -40,8 +40,8 @@ class PendaftaranLabController extends Controller
         $tarifvars = TarifVar::all();
         $tgl = date('y') . date('m') . date('d');
         $provinsi = Provinsi::all();
-        $pengirim = Group::where('grup_jenis', '=', 'PRSH')->orderBy('grup_kode', 'asc')->distinct()->get()->unique('grup_kode');
-        $dokter = Dokter::where('unit_kode', '32')->get();
+        $pengirim = Group::where('grup_jenis', '=', 'PRSH')->where('status', 'A')->orderBy('grup_kode', 'asc')->distinct()->get()->unique('grup_kode');
+        $dokter = Dokter::where('unit_kode', '32')->where('dokter_status', 'A')->get();
         $unit = Unit::where('unit_kode', '32')->get();
         $user_mobile = UserMobile::all();
 
@@ -249,7 +249,7 @@ class PendaftaranLabController extends Controller
             })
             ->join('provinsi', 'provinsi.prov_id', 'pasiens.pasien_prov')
             ->join('kota', 'kota.city_id', 'pasiens.pasien_kota')
-            ->join('user_mobiles', 'user_mobiles.id', 'pasiens.user_mobile_id')
+            ->leftJoin('user_mobiles', 'user_mobiles.id', 'pasiens.user_mobile_id')
             ->join('kecamatan', 'kecamatan.dis_id', 'pasiens.pasien_kecamatan')
             ->join('kelurahan', 'kelurahan.subdis_id', 'pasiens.pasien_kelurahan')
             ->select('pasiens.*', 'gender.var_nama as gender', 'pndk.var_nama as pndk', 'jenis.var_nama as jenis', 'agama.var_nama as agama', 'provinsi.prov_name', 'kota.city_name', 'kecamatan.dis_name', 'kelurahan.subdis_name', 'user_mobiles.nama_lengkap')

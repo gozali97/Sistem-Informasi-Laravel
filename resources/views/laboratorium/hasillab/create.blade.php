@@ -50,7 +50,7 @@
                                             <th>Nama Pasien</th>
                                             <th>Jenis Pasien</th>
                                             <th>Umur</th>
-                                            <th>Nama Pemeriksaan</th>
+                                            <th>Nama Pemeriksaan Laboratorium</th>
                                             <th>Hasil</th>
                                             <th>Satuan</th>
                                         </thead>

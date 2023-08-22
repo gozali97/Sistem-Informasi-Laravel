@@ -30,15 +30,43 @@ class PendaftaranPasienController extends Controller
             ->join('admvars', 'admvars.var_kode', '=', 'pasiens.pasien_jenis')
             ->where('admvars.var_seri', 'JENISPAS')
             ->select('pasiens.*', 'admvars.var_nama')
+            ->orderBy('pasien_nomor_rm', 'desc')
             ->get();
 
         return view('pendaftaran.pasien.index', compact('data'));
         // return view('errors.505');
     }
 
+    public function createNewRegNumber()
+    {
+        $now = new DateTime();
+        $year = $now->format('y');
+        $month = $now->format('m');
+        $day = $now->format('d');
+        $lastPasien = Pasien::orderBy('pasien_nomor_rm', 'desc')->first();
+
+        if ($lastPasien == null) {
+            $newNumber = '001';
+        } else {
+            $lastLabNumber = $lastPasien->pasien_nomor_rm;
+            $lastYear = substr($lastLabNumber, 1, 2);
+            $lastMonth = substr($lastLabNumber, 3, 2);
+            $lastDay = substr($lastLabNumber, 5, 2);
+            $lastNumber = (int)substr($lastLabNumber, -3);
+
+            if ($lastYear != $year && $lastMonth != $month && $lastDay != $day) {
+                $newNumber = '001';
+            } else {
+                $newNumber = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+            }
+        }
+        return 'H' . $year . $month . $day . $newNumber;
+    }
+
 
     public function create()
     {
+
         $Gender = Admvar::where('var_seri', '=', 'GENDER')->get();
         $JenisPasien = Admvar::where('var_seri', '=', 'JENISPAS')->get();
         $StatusKwn = Admvar::where('var_seri', '=', 'KAWIN')->get();
@@ -56,52 +84,7 @@ class PendaftaranPasienController extends Controller
         $Title = Admvar::where('var_seri', 'TITLE')->get();
         $user_mobile = UserMobile::all();
 
-        return view(
-            'pendaftaran.pasien.create',
-            compact(
-                'Gender',
-                'provinsi',
-                'JenisPasien',
-                'StatusKwn',
-                'Religion',
-                'GolDarah',
-                'Pendidikan',
-                'Pekerjaan',
-                'Family',
-                'autoNumber',
-                'Title',
-                'kota',
-                'kecamatan',
-                'kelurahan',
-                'user_mobile'
-            )
-        );
-    }
-
-    public function createNewRegNumber()
-    {
-        $now = new DateTime();
-        $year = $now->format('y');
-        $month = $now->format('m');
-        $day = $now->format('d');
-        $lastPasien = Pasien::orderBy('pasien_nomor_rm', 'desc')->first();
-
-        if ($lastPasien == null) {
-            $newNumber = '001';
-        } else {
-            $lastLabNumber = $lastPasien->pasien_nomor_rm;
-            $lastYear = substr($lastLabNumber, 3, 2);
-            $lastMonth = substr($lastLabNumber, 5, 2);
-            $lastDay = substr($lastLabNumber, 7, 2);
-            $lastNumber = (int)substr($lastLabNumber, -4);
-
-            if ($lastYear != $year || $lastMonth != $month || $lastDay != $day) {
-                $newNumber = '001';
-            } else {
-                $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-            }
-        }
-        return 'H' . $year . $month . $day . $newNumber;
+        return view('pendaftaran.pasien.create', compact('Gender', 'provinsi', 'JenisPasien', 'StatusKwn', 'Religion', 'GolDarah', 'Pendidikan', 'Pekerjaan', 'Family', 'autoNumber', 'Title', 'kota', 'kecamatan', 'kelurahan', 'user_mobile'));
     }
 
 
@@ -268,26 +251,7 @@ class PendaftaranPasienController extends Controller
         $Title = Admvar::where('var_seri', 'TITLE')->get();
         $user_mobile = UserMobile::all();
 
-        return view(
-            'pendaftaran.pasien.edit',
-            compact(
-                'Gender',
-                'provinsi',
-                'JenisPasien',
-                'StatusKwn',
-                'Religion',
-                'GolDarah',
-                'Pendidikan',
-                'Pekerjaan',
-                'Family',
-                'data',
-                'Title',
-                'kota',
-                'kecamatan',
-                'kelurahan',
-                'user_mobile'
-            )
-        );
+        return view('pendaftaran.pasien.edit', compact('Gender', 'provinsi', 'JenisPasien', 'StatusKwn', 'Religion', 'GolDarah', 'Pendidikan', 'Pekerjaan', 'Family', 'data', 'Title', 'kota', 'kecamatan', 'kelurahan', 'user_mobile'));
     }
 
 

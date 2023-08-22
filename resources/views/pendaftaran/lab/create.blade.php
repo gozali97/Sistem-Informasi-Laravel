@@ -43,14 +43,14 @@
                         <div>
                             <label class="form-label">Nomor Trans</label>
                             <input type="text" name="notrans" id="notrans" class="form-control"
-                                value="{{ $autoNumbers }}" readonly>
+                                   value="{{ $autoNumbers }}" readonly>
                         </div>
                         <div class="mt-2">
                             <label class="form-label"></label>
                             <div class="row">
                                 <div class="col-md-3 ml-2">
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#pasienModal">
+                                            data-bs-target="#pasienModal">
                                         Pasien Lama
                                     </button>
                                 </div>
@@ -60,7 +60,7 @@
                                 </div>
                                 <div class="col-md-3 ml-3">
                                     <a href="#formsearch" id="caripasienapp" onclick="cariPasienApp();"
-                                        class="btn btn-info" data-toggle="modal"> Pasien Appointment</a>
+                                       class="btn btn-info" data-toggle="modal"> Pasien Appointment</a>
                                 </div>
                             </div>
                         </div>
@@ -97,15 +97,15 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <input type="text" name="pasienumurthn" id="pasienumurthn" class="form-control"
-                                        placeholder="0" readonly> Tahun
+                                           placeholder="0" readonly> Tahun
                                 </div>
                                 <div class="col-md-4">
                                     <input type="text" name="pasienumurbln" id="pasienumurbln" class="form-control"
-                                        placeholder="0" readonly> Bulan
+                                           placeholder="0" readonly> Bulan
                                 </div>
                                 <div class="col-md-4">
                                     <input type="text" name="pasienumurhari" id="pasienumurhari" class="form-control"
-                                        placeholder="0" readonly> Hari
+                                           placeholder="0" readonly> Hari
                                 </div>
                             </div>
                         </div>
@@ -235,35 +235,35 @@
 
     <script>
         @if (session('toast_success'))
-            iziToast.success({
-                title: 'Success',
-                message: '{{ session('toast_success') }}',
-                position: 'topRight'
-            });
+        iziToast.success({
+            title: 'Success',
+            message: '{{ session('toast_success') }}',
+            position: 'topRight'
+        });
         @elseif (session('toast_failed'))
-            iziToast.error({
-                title: 'Failed',
-                message: '{{ session('toast_failed') }}',
-                position: 'topRight'
-            });
+        iziToast.error({
+            title: 'Failed',
+            message: '{{ session('toast_failed') }}',
+            position: 'topRight'
+        });
         @endif
     </script>
 
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             var data; // Declare data variable outside the AJAX call
 
-            $("#pasienModal").on("show.bs.modal", function() {
+            $("#pasienModal").on("show.bs.modal", function () {
                 $('#tablepasien').empty();
 
                 $.ajax({
                     url: "/pendaftaran/lab/getPasien",
                     type: "GET",
-                    success: function(result) {
+                    success: function (result) {
 
                         data = result;
-                        data.forEach(function(pasien, index) {
+                        data.forEach(function (pasien, index) {
                             var row = '<tr>' +
                                 '<td><input type="radio" name="pasien_radio" value="' +
                                 pasien.pasien_nomor_rm + '"></td>' +
@@ -275,19 +275,19 @@
                         });
                         $('#table1').DataTable();
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error(error);
                     }
                 });
             });
 
             // Event listener for the "Pilih" button click
-            $('#simpan').click(function() {
+            $('#simpan').click(function () {
                 // Get the selected pasien_nomor_rm from the radio buttons
                 var selectedPasienRm = $('input[name="pasien_radio"]:checked').val();
 
                 // Find the selected pasien in the data array
-                var selectedPasien = data.find(function(pasien) {
+                var selectedPasien = data.find(function (pasien) {
                     return pasien.pasien_nomor_rm === selectedPasienRm;
                 });
 
@@ -295,8 +295,13 @@
                 if (selectedPasien) {
                     $('#pasien_rm').val(selectedPasien.pasien_nomor_rm);
                     $('#pasiennorm').val(selectedPasien.pasien_nomor_rm);
-                    $('#nama_mobile').val(selectedPasien.nama_lengkap);
-                    $('#mobile_id').val(selectedPasien.user_mobile_id);
+                    if (selectedPasien.user_mobile_id == '') {
+                        $('#nama_mobile').val('Tidak Ada');
+                        $('#mobile_id').val(0);
+                    } else {
+                        $('#nama_mobile').val(selectedPasien.nama_lengkap);
+                        $('#mobile_id').val(selectedPasien.user_mobile_id);
+                    }
                     $('#nama').val(selectedPasien.pasien_nama);
                     $('#panggilan').val(selectedPasien.pasien_panggilan);
                     $('#nama_jk').val(selectedPasien.gender);
@@ -334,7 +339,7 @@
                 }
             });
 
-            $('#pengirim').change(function() {
+            $('#pengirim').change(function () {
                 var kdpengirim = $(this).val();
                 kdpengirim = kdpengirim.substr(0, 1);
                 Swal.fire({
@@ -352,7 +357,7 @@
                         kdpengirim: kdpengirim,
                         _token: '{{ csrf_token() }}'
                     },
-                    success: function(data) {
+                    success: function (data) {
                         Swal.close();
                         $("#namapengirim").html('');
                         if (data.length === 0) {
@@ -362,14 +367,14 @@
                                 text: 'Data tidak ditemukan untuk perusahaan yang dipilih.',
                             });
                         } else {
-                            $.each(data, function(index, value) {
+                            $.each(data, function (index, value) {
                                 $("#namapengirim").append('<option value="' + value
-                                    .prsh_kode +
+                                        .prsh_kode +
                                     '">' + value.prsh_nama + '</option>');
                             });
                         }
                     },
-                    error: function() {
+                    error: function () {
                         Swal.close();
                         Swal.fire({
                             icon: 'error',
@@ -380,7 +385,7 @@
                 });
             });
 
-            $('#namapengirim').change(function() {
+            $('#namapengirim').change(function () {
                 var kdpengirim = $(this).val();
                 kdpengirim = kdpengirim.substr(0, 1);
                 Swal.fire({
@@ -398,7 +403,7 @@
                         kdpengirim: kdpengirim,
                         _token: '{{ csrf_token() }}'
                     },
-                    success: function(data) {
+                    success: function (data) {
                         Swal.close();
                         $("#penjamin").html('');
                         if (data.length === 0) {
@@ -408,14 +413,14 @@
                                 text: 'Data tidak ditemukan untuk perusahaan yang dipilih.',
                             });
                         } else {
-                            $.each(data, function(index, value) {
+                            $.each(data, function (index, value) {
                                 $("#penjamin").append('<option value="' + value
-                                    .prsh_kode +
+                                        .prsh_kode +
                                     '">' + value.prsh_nama + '</option>');
                             });
                         }
                     },
-                    error: function() {
+                    error: function () {
                         Swal.close();
                         Swal.fire({
                             icon: 'error',
@@ -443,7 +448,7 @@
 
             // Event listener untuk memanggil fungsi submitForm saat form disubmit
             var form = document.getElementById('form-id');
-            form.addEventListener('submit', function(event) {
+            form.addEventListener('submit', function (event) {
                 event.preventDefault(); // Mencegah submit otomatis
                 if (submitForm()) {
                     form.submit(); // Submit form jika valid

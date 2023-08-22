@@ -8,11 +8,12 @@
             <div class="modal-body">
                 <table class="table table-striped" id="table2">
                     <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nama Layanan</th>
-                            <th>Harga </th>
-                        </tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Tarif Kode</th>
+                        <th>Nama Layanan</th>
+                        <th>Harga</th>
+                    </tr>
                     </thead>
                     <tbody id="tableTarif">
                     </tbody>

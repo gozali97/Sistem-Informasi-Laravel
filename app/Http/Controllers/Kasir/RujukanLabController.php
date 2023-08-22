@@ -80,7 +80,7 @@ class RujukanLabController extends Controller
 
         $user_mobile = UserMobile::all();
 
-        $autoNumbers = $this->createNewLabNumber();
+        $autoNumbers = $this->createNewRujNumber();
 
 
         return view('kasir.rujukan.create', compact('autoNumbers', 'user_mobile'));
@@ -91,16 +91,18 @@ class RujukanLabController extends Controller
         try {
             DB::beginTransaction();
             $validator = Validator::make($request->all(), [
-                'jamperiksa' => 'required',
-                'jenis_layanan' => 'required',
-                'kodeTarif' => 'required',
+                'rumah_sakit' => 'required',
+                'nama_dokter' => 'required',
                 'pasien_rm' => 'required',
+                'kodeTarif' => 'required',
+                'file_rujukan' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             ],
                 [
-                    'jamperiksa.required' => 'Kolom Jam Periksa harus diisi.',
+                    'nama_dokter.required' => 'Kolom nama dokter harus diisi.',
+                    'rumah_sakit.required' => 'Kolom rumah sakit harus diisi.',
                     'pasien_rm.required' => 'Data pasien kosong.',
                     'kodeTarif.required' => 'Data layanan kosong.',
-                    'jenis_layanan.required' => 'Kolom Jenis Layanan Test harus diisi.',
+                    'file_rujukan.required' => 'Kolom upload file rujukan harus diisi.',
                 ]
             );
 
@@ -108,111 +110,55 @@ class RujukanLabController extends Controller
                 return redirect()->back()->withErrors($validator);
             }
 
-            $labno = $request->notrans;
-
+            $imageName = '/rujukan/' . $request->pasien_rm . '-' . time() . 'rujukan' . '.' . $request->file_rujukan->extension();
+            $path = $request->file('file_rujukan')->move('rujukan/', $imageName);
 
             $pasien = Pasien::where('pasien_nomor_rm', $request->pasiennorm)->first();
-            $dokter = Dokter::where('dokter_kode', $request->dokterkode)->first();
 
 
-            $kota = Kota::where('city_id', $pasien->pasien_kota)->first();
-
-            $tgl = date('y') . date('m');
-
-            $month = date('m');
-            $years = date('Y');
-
-            $data = new Transaksi;
-
-            $data->lab_nomor = $request->notrans;
+            $data = new Rujukan;
+            $data->pasien_nomor_rm = $request->pasien_rm;
             $data->user_mobile_id = $pasien->user_mobile_id;
-            $data->lab_tanggal = date('Y-m-d H:i:s');
-            $data->lab_reff_no = chr((int)$month + 64) . '.' . Str::substr($years, 2) . '.';
-            $data->lab_jenis = 'J';
-            $data->lab_no_reg = $request->labnoreg;
-            $data->lab_pas_baru = $request->jenispasienbarulama;
-            $data->tt_nomor = '';
-            $data->kelas_kode = 'J';
-            $data->dokter_kode = $request->dokterkode;
-            $data->dokter_nama = $dokter->dokter_nama;
-            $data->lab_jam_sample = $request->jamperiksa;
-            $data->pasien_nomor_rm = $request->pasiennorm;
-            $data->pasien_gender = $pasien->pasien_gender;
-            $data->pasien_nama = $request->nama;
-            $data->pasien_alamat = $request->alamat;
-            $data->pasien_kota = $kota->city_name;
-            $data->pasien_umur_thn = $request->pasienumurthn;
-            $data->pasien_umur_bln = $request->pasienumurbln;
-            $data->pasien_umur_hr = $request->pasienumurhari;
-            $data->lab_petugas = '';
-            $data->lab_cat_hasil = '';
-            $data->prsh_kode = $request->prshkode;
-            $data->lab_jumlah = $request->totalLab;
-            if ($request->prshkode == '0-0000') {
-                $data->lab_pribadi = $request->totalHarga;
-            } else {
-                $data->lab_asuransi = $request->totalLab;
-            }
-            $data->lab_pribadi = $request->totalLab;
-            $data->lab_byr_jenis = '1';
-            $data->user_id = Auth::User()->username;
-            $data->user_id2 = Auth::User()->username;
-            $data->user_date = date('Y-m-d H:i:s');
-            $data->user_date2 = date('Y-m-d H:i:s');
-            $data->lab_ambil_status = '0';
-            $data->lab_ambil_jam = $request->jamperiksa;
-            $data->lab_cetak_status = '0';
-            $data->jenis_layanan = $request->jenis_layanan;
-            $data->id_client = Auth::User()->idlab;
+            $data->rujukan_no = $this->createNewRujNumber();
+            $data->nama_pasien = $request->nama;
+            $data->file_rujukan = $imageName;
+            $data->nama_dokter = $request->nama_dokter;
+            $data->rumah_sakit = $request->rumah_sakit;
+            $data->tanggal_transaksi = date('Y-m-d H:i:s');
+            $data->status = 1;
+            $data->create_date = date('Y-m-d H:i:s');
+            $data->create_by = Auth::User()->username;
 
             if ($data->save()) {
-
-                $latestLabAutoNomor = TransaksiDetail::orderBy('lab_auto_nomor', 'desc')->first();
-
-                if ($latestLabAutoNomor) {
-                    $labAutoNomor = (int)$latestLabAutoNomor->lab_auto_nomor + 1;
-                } else {
-                    $labAutoNomor = 1;
-                }
 
                 $labDetails = [];
 
                 foreach ($request->kodeTarif as $list => $labDetail) {
 
-                    $labAutoNomor = $labAutoNomor + $list;
-
                     $detail = [
-                        'lab_nomor' => $labno,
-                        'lab_kode_detail' => $labDetail,
+                        'rujukan_id' => $data->rujukan_id,
+                        'item_id' => $labDetail,
                         'lab_nama' => $request->namaTarif[$list],
                         'lab_banyak' => 1,
-                        'lab_auto_nomor' => $labAutoNomor,
                         'lab_tarif' => $request->tarifPeriksa[$list],
-                        'lab_tarif_askes' => 0,
-                        'lab_diskon_prs' => $request->discPercentage[$list],
-                        'lab_diskon' => $request->discRp[$list],
-                        'lab_asuransi' => $request->asuransi[$list],
-                        'lab_pribadi' => $request->bayarSendiri[$list],
-                        'id_client' => Auth::User()->idlab,
-                        'lab_jumlah' => $request->totalLab,
+                        'status' => "A",
                     ];
 
                     $labDetails[] = $detail;
 
                 }
 
-                TransaksiDetail::insert($labDetails);
+                RujukanDetail::insert($labDetails);
 
-                RawatJalan::where('jalan_no_reg', $request->labnoreg)->delete();
                 DB::commit();
 
-                Session::flash('toast_success', 'Data berhasil ditambah');
-                return redirect()->route('transaksi.index');
+                Session::flash('toast_success', 'Data berhasil ditambahkan');
+                return redirect()->route('rujukan.index');
             }
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error creating daftarlab: ' . $e->getMessage());
-            Session::flash('toast_failed', 'Gagal menambahkan data. Silakan coba lagi.');
+            Log::error('Error creating rujukan: ' . $e->getMessage());
+            Session::flash('toast_failed', 'Gagal menambah data. Silakan coba lagi.');
             return redirect()->back();
         }
     }
@@ -276,7 +222,7 @@ class RujukanLabController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error creating rujukan: ' . $e->getMessage());
-            Session::flash('toast_failed', 'Gagal emngubah data. Silakan coba lagi.');
+            Session::flash('toast_failed', 'Gagal mengubah data. Silakan coba lagi.');
             return redirect()->back();
         }
     }
@@ -304,11 +250,18 @@ class RujukanLabController extends Controller
         return redirect()->back();
     }
 
+    public function getPasien()
+    {
+        $data = Pasien::all();
+
+        return response()->json($data);
+    }
+
     public function getPemeriksaan()
     {
-
         $data = TarifLab::query()
-            ->orderBy('tarif_kode', 'ASC')
+            ->where('tarif_status', 'A')
+            ->orderBy('id', 'desc')
             ->get();
 
         return response()->json($data);
@@ -316,10 +269,12 @@ class RujukanLabController extends Controller
 
     public function getPaket()
     {
-
         $data = PaketLab::query()
-            ->orderBy('paket_kode', 'ASC')
+            ->where('paket_status', 'A')
+            ->orderBy('paket_kode', 'desc')
             ->get();
+
+        return response()->json($data);
 
     }
 }
